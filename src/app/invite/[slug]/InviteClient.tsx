@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { MapPin, Calendar, Clock, Music, Heart, Check, X, HelpCircle, Send } from 'lucide-react';
 import confetti from 'canvas-confetti';
@@ -13,8 +13,8 @@ import type { InvitePayload, RsvpStatus } from '@/lib/types';
 const TITLE_MAP: Record<string, string> = { MR: 'Mr.', MRS: 'Mrs.', MS: 'Ms.', DR: 'Dr.', FAMILY: 'The', MASTER: 'Master' };
 
 export default function InviteClient() {
-  const searchParams = useSearchParams();
-  const token = searchParams.get('token');
+  const params = useParams();
+  const token = params.slug as string | null;
 
   const [data, setData] = useState<InvitePayload | null>(null);
   const [loading, setLoading] = useState(true);
