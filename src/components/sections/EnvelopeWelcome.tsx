@@ -44,14 +44,21 @@ export default function EnvelopeWelcome({ guestName, onOpen, onSequenceComplete 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.2 }}
-            className="text-center px-4"
+            className="text-center px-4 flex flex-col items-center w-full max-w-2xl mx-auto"
           >
-            <p className="font-sans text-[10px] md:text-xs uppercase tracking-[4px] text-earth-brown mb-4">
+            {/* Vintage top flourish */}
+            <div className={styles.vintageOrnament} />
+
+            <p className="font-sans text-[10px] md:text-xs uppercase tracking-[4px] text-gold-dark mb-4 opacity-80">
               A Special Invitation For
             </p>
-            <h1 className="font-serif text-3xl md:text-4xl text-charcoal font-semibold mb-8">
+
+            <h1 className={`${styles.vintageName} font-serif text-3xl md:text-5xl text-charcoal mb-6 px-4 py-2`}>
               {guestName}
             </h1>
+
+            {/* Vintage bottom divider */}
+            <div className={styles.vintageDivider} />
           </motion.div>
 
           <motion.div
@@ -88,7 +95,9 @@ export default function EnvelopeWelcome({ guestName, onOpen, onSequenceComplete 
               style={{ transformOrigin: 'top', backfaceVisibility: 'hidden' }}
             >
               <div className={styles.waxSeal}>
-                <div className={styles.waxSealInner} />
+                <div className={styles.waxSealInner}>
+                  <span className={styles.waxSealLetter}>W</span>
+                </div>
               </div>
             </motion.div>
           </motion.div>
