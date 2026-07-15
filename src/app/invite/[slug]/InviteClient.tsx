@@ -150,7 +150,7 @@ export default function InviteClient() {
           <HeroSection wedding={wedding} />
           
           <div className="relative z-10 -mt-20">
-            <InvitationCard brideName={wedding.brideName} groomName={wedding.groomName} />
+            <InvitationCard wedding={wedding} guestName={guestName} />
           </div>
 
           <CountdownTimer targetDate={wedding.weddingDate} />

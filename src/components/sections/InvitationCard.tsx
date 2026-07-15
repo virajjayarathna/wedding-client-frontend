@@ -3,11 +3,14 @@
 import { motion } from 'framer-motion';
 
 interface InvitationCardProps {
-  brideName: string;
-  groomName: string;
+  wedding: any;
+  guestName: string;
 }
 
-export default function InvitationCard({ brideName, groomName }: InvitationCardProps) {
+export default function InvitationCard({ wedding, guestName }: InvitationCardProps) {
+  const primaryColor = wedding?.primaryColor || '#C5A059';
+  const accentColor = wedding?.accentColor || '#E8E8E8';
+
   return (
     <section className="py-24 px-4 md:px-6 relative z-10 w-full flex justify-center">
       <motion.div 
@@ -15,28 +18,74 @@ export default function InvitationCard({ brideName, groomName }: InvitationCardP
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 1 }}
-        className="card-elegant w-full max-w-2xl p-10 md:p-16 text-center relative"
+        className="w-full max-w-2xl p-8 md:p-14 text-center relative bg-white flex flex-col items-center"
+        style={{
+          border: `1px solid ${accentColor}`,
+          boxShadow: '0 20px 40px rgba(0,0,0,0.05)',
+        }}
       >
-        <div className="absolute inset-0 border-[1px] border-gold opacity-30 m-3 md:m-4 pointer-events-none" />
+        <div 
+          className="absolute inset-0 pointer-events-none m-4 md:m-5" 
+          style={{ border: `2px solid ${primaryColor}`, opacity: 1 }}
+        />
+        <div 
+          className="absolute inset-0 pointer-events-none m-[22px] md:m-[27px]" 
+          style={{ border: `1px solid ${accentColor}`, opacity: 1 }}
+        />
         
-        <p className="font-sans text-[10px] md:text-xs uppercase tracking-[3px] text-charcoal/60 mb-8">
-          Together with their families
-        </p>
-        
-        <h2 className="font-serif text-4xl md:text-5xl text-charcoal mb-4 font-medium">
-          {brideName}
-        </h2>
-        <span className="font-serif text-2xl text-gold italic block mb-4">&amp;</span>
-        <h2 className="font-serif text-4xl md:text-5xl text-charcoal mb-8 font-medium">
-          {groomName}
-        </h2>
-        
-        <div className="w-12 h-[1px] bg-gold/50 mx-auto mb-8" />
+        {wedding?.pdfLogoUrl ? (
+          <div className="mb-6 md:mb-8 h-32 md:h-48 flex items-center justify-center relative z-10 mt-6">
+            <img src={wedding.pdfLogoUrl} alt="Logo" className="max-h-full max-w-full object-contain" />
+          </div>
+        ) : (
+          <div className="mb-6 md:mb-8 flex items-center justify-center relative z-10 mt-8">
+            <div 
+              className="text-7xl md:text-8xl flex"
+              style={{ 
+                color: primaryColor,
+                fontFamily: wedding?.pdfFont ? `'${wedding.pdfFont}', cursive` : "'Great Vibes', cursive",
+                lineHeight: 1
+              }}
+            >
+              <span>{wedding?.brideName?.[0]}</span>
+              <span className="-ml-4 md:-ml-6 opacity-90">{wedding?.groomName?.[0]}</span>
+            </div>
+          </div>
+        )}
 
-        <p className="font-sans text-sm md:text-base leading-relaxed text-charcoal/80 max-w-md mx-auto">
-          Joyfully request the pleasure of your company as we celebrate our marriage. 
-          Your presence will make our special day complete.
-        </p>
+        <div className="font-serif text-[11px] md:text-[13px] tracking-[2px] uppercase text-[#333333] mb-4 md:mb-6 leading-[1.8] relative z-10" style={{ fontFamily: "'Playfair Display', serif" }}>
+          MR. &amp; MRS. {wedding?.brideFatherName?.toUpperCase() || ''}<br/>
+          <span className="inline-block my-2 text-[11px] md:text-[13px] tracking-[2px]">TOGETHER WITH</span><br/>
+          MR. &amp; MRS. {wedding?.groomFatherName?.toUpperCase() || ''}
+        </div>
+
+        <div className="font-serif text-[11px] md:text-[13px] text-[#333333] uppercase tracking-[1px] my-4 md:my-6 relative z-10" style={{ fontFamily: "'Playfair Display', serif" }}>
+          REQUEST THE HONOUR OF THE PRESENCE OF
+        </div>
+
+        <div 
+          className="font-serif text-lg md:text-xl text-[#333333] my-4 md:my-6 py-4 px-8 w-full max-w-[80%] relative z-10"
+          style={{ borderTop: `1px solid ${accentColor}`, borderBottom: `1px solid ${accentColor}`, fontFamily: "'Playfair Display', serif" }}
+        >
+          {guestName.toUpperCase()}
+        </div>
+
+        <div className="font-serif text-[10px] md:text-[12px] text-[#333333] uppercase tracking-[1px] my-4 md:my-6 leading-[1.8] relative z-10" style={{ fontFamily: "'Playfair Display', serif" }}>
+          TO CELEBRATE THE WEDDING OF THEIR DAUGHTER &amp; SON
+        </div>
+
+        <h2 
+          className="text-5xl md:text-6xl mb-6 relative z-10 pt-4"
+          style={{ 
+            color: primaryColor,
+            fontFamily: wedding?.pdfFont ? `'${wedding.pdfFont}', cursive` : "'Great Vibes', cursive",
+            lineHeight: 1.2,
+            padding: '0 10px'
+          }}
+        >
+          {wedding?.brideName} <span className="font-serif text-3xl md:text-4xl italic px-2 text-gold" style={{ fontFamily: "'Playfair Display', serif" }}>&amp;</span> {wedding?.groomName}
+        </h2>
+        
       </motion.div>
     </section>
   );
