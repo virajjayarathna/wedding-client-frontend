@@ -7,21 +7,29 @@ import styles from './turnbook.module.css';
 
 interface LoveStoryGalleryProps {
   images: string[];
+  brideName?: string;
+  groomName?: string;
 }
 
-export default function LoveStoryGallery({ images }: LoveStoryGalleryProps) {
+export default function LoveStoryGallery({ images, brideName = "RUWANTHI", groomName = "KASUN" }: LoveStoryGalleryProps) {
   const [currentPage, setCurrentPage] = useState(0);
 
   if (!images || images.length === 0) return null;
 
-  // Pair images into pages
-  const pages = [];
+  // Setup pages: Cover -> Photos -> Backcover
+  const pages: any[] = [
+    { type: 'cover' }
+  ];
+  
   for (let i = 0; i < images.length; i += 2) {
     pages.push({
+      type: 'photo',
       front: images[i],
       back: images[i + 1] || null, 
     });
   }
+  
+  pages.push({ type: 'backcover' });
 
   const nextPage = () => {
     if (currentPage < pages.length) {
@@ -70,6 +78,64 @@ export default function LoveStoryGallery({ images }: LoveStoryGalleryProps) {
           {pages.map((page, index) => {
             const isFlipped = index < currentPage;
             const zIndex = isFlipped ? index : pages.length - index;
+
+            if (page.type === 'cover') {
+              return (
+                <div 
+                  key={index} 
+                  className={`${styles.page} ${isFlipped ? styles.pageFlipped : ''}`}
+                  style={{ zIndex }}
+                  onClick={() => {
+                    if (isFlipped) prevPage();
+                    else nextPage();
+                  }}
+                >
+                  <div className={`${styles.pageFront} ${styles.coverFront}`}>
+                    <div className={styles.embossedText}>
+                      <p className="font-serif text-xl italic mb-4" style={{ color: '#D4AF37' }}>The Union of</p>
+                      <h2 className="font-serif text-3xl md:text-4xl" style={{ color: '#F1D570' }}>{groomName.toUpperCase()} & {brideName.toUpperCase()}</h2>
+                    </div>
+                    <div className={`${styles.goldFiligree} my-8`} />
+                    <div className={styles.embossedText}>
+                      <p className="font-sans text-[10px] md:text-xs tracking-widest text-gold-light uppercase">A Chronicle of Our Memories</p>
+                    </div>
+                  </div>
+                  <div className={`${styles.pageBack} ${styles.coverInside}`}>
+                    <div className="w-full h-full border border-gold-light/20 flex items-center justify-center">
+                      <span className="font-serif text-gold/20 text-4xl">✦</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+            
+            if (page.type === 'backcover') {
+              return (
+                <div 
+                  key={index} 
+                  className={`${styles.page} ${isFlipped ? styles.pageFlipped : ''}`}
+                  style={{ zIndex }}
+                  onClick={() => {
+                    if (isFlipped) prevPage();
+                    else nextPage();
+                  }}
+                >
+                  <div className={`${styles.pageFront} ${styles.coverInside}`}>
+                    <div className="w-full h-full border border-gold-light/20 flex items-center justify-center">
+                      <span className="font-serif text-gold/20 text-4xl">✦</span>
+                    </div>
+                  </div>
+                  <div className={`${styles.pageBack} ${styles.coverBack}`}>
+                    <div className={styles.embossedText}>
+                       <h3 className="font-serif text-xl tracking-widest text-gold mb-4">OUR WEDDING BOOK</h3>
+                       <div className="w-16 h-[1px] bg-gold mx-auto mb-6" />
+                       <p className="font-serif italic text-gold-light mb-8">A Lifetime of Shared Love</p>
+                       <p className="font-sans text-[10px] tracking-[4px] text-gold-light">EST. 2024</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            }
 
             return (
               <div 

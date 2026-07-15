@@ -156,7 +156,11 @@ export default function InviteClient() {
           <CountdownTimer targetDate={wedding.weddingDate} />
           
           {wedding.galleryUrls && wedding.galleryUrls.length > 0 && (
-            <LoveStoryGallery images={wedding.galleryUrls} />
+            <LoveStoryGallery 
+              images={wedding.galleryUrls} 
+              brideName={wedding.brideName} 
+              groomName={wedding.groomName} 
+            />
           )}
 
           <VenueSection wedding={wedding} />
