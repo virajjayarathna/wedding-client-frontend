@@ -65,14 +65,6 @@ export default function LoveStoryGallery({ images, brideName = "RUWANTHI", groom
         transition={{ duration: 1 }}
         className={styles.bookContainer}
       >
-        <button 
-          onClick={prevPage} 
-          disabled={currentPage === 0}
-          className={`${styles.navButton} ${styles.navPrev}`}
-          aria-label="Previous page"
-        >
-          <ChevronLeft size={24} />
-        </button>
 
         {/* Background text phases */}
         <div className="absolute inset-0 flex items-center justify-between pointer-events-none z-0">
@@ -209,18 +201,10 @@ export default function LoveStoryGallery({ images, brideName = "RUWANTHI", groom
           })}
         </div>
 
-        <button 
-          onClick={nextPage} 
-          disabled={currentPage >= pages.length}
-          className={`${styles.navButton} ${styles.navNext}`}
-          aria-label="Next page"
-        >
-          <ChevronRight size={24} />
-        </button>
       </motion.div>
       
       <p className="text-center text-charcoal/40 text-xs mt-16 italic font-serif">
-        Tap on the pages or use arrows to flip
+        Tap on the pages to flip
       </p>
     </section>
   );
