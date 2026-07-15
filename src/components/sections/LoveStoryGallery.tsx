@@ -74,7 +74,48 @@ export default function LoveStoryGallery({ images, brideName = "RUWANTHI", groom
           <ChevronLeft size={24} />
         </button>
 
-        <div className={styles.book}>
+        {/* Background text phases */}
+        <div className="absolute inset-0 flex items-center justify-between pointer-events-none z-0">
+          {/* Opening Phase (Left) */}
+          <div 
+            className={`w-1/2 h-full p-4 md:p-8 flex flex-col items-center justify-center text-center transition-opacity duration-1000 ${currentPage === 0 ? 'opacity-100' : 'opacity-0'}`}
+          >
+            <h4 className="font-serif text-lg md:text-2xl text-gold mb-4 italic">Every great story begins with a single page...</h4>
+            <div className="w-16 h-[1px] bg-gold/50 mx-auto mb-6" />
+            <p className="font-sans text-xs md:text-sm text-charcoal/80 leading-relaxed mb-4">
+              Ours began with a smile,<br/>
+              grew through friendship,<br/>
+              blossomed into love,<br/>
+              and now leads us to forever.
+            </p>
+            <p className="font-sans text-xs md:text-sm text-charcoal/80 leading-relaxed italic mt-2">
+              We invite you to turn the page<br/>
+              and become part of the most beautiful<br/>
+              chapter of our lives.
+            </p>
+          </div>
+
+          {/* Closing Phase (Right) */}
+          <div 
+            className={`w-1/2 h-full p-4 md:p-8 flex flex-col items-center justify-center text-center transition-opacity duration-1000 ${currentPage === pages.length ? 'opacity-100' : 'opacity-0'}`}
+          >
+            <h4 className="font-serif text-lg md:text-2xl text-gold mb-6 italic">And so, our story continues...</h4>
+            <div className="w-16 h-[1px] bg-gold/50 mx-auto mb-6" />
+            <p className="font-sans text-xs md:text-sm text-charcoal/80 leading-relaxed mb-4">
+              Though this book comes to an end,<br/>
+              our greatest adventure is only just beginning.
+            </p>
+            <p className="font-sans text-xs md:text-sm text-charcoal/80 leading-relaxed mb-6">
+              Thank you for walking beside us<br/>
+              as we begin this lifelong journey together.
+            </p>
+            <p className="font-serif italic text-gold mb-2 text-sm">With all our love,</p>
+            <p className="font-serif text-base md:text-xl text-charcoal/90 mb-4">{brideName} & {groomName}</p>
+            <p className="font-sans text-[10px] uppercase tracking-widest text-gold-light">Happily Ever After Starts Here.</p>
+          </div>
+        </div>
+
+        <div className={`${styles.book} z-10`}>
           {pages.map((page, index) => {
             const isFlipped = index < currentPage;
             const zIndex = isFlipped ? index : pages.length - index;
