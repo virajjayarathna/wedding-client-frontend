@@ -64,11 +64,15 @@ export default function EnvelopeWelcome({ guestName, onOpen, onSequenceComplete 
           <motion.div
             className={styles.envelopeContainer}
             onClick={handleTap}
-            initial={{ scale: 1 }}
+            role="button"
+            aria-label="Tap to open envelope"
+            whileHover={!isAnimating && !isDone ? { scale: 1.05 } : {}}
+            whileTap={!isAnimating && !isDone ? { scale: 0.95 } : {}}
+            initial={{ scale: 1, y: 0 }}
             animate={
               !isAnimating
-                ? { scale: [1, 1.02, 1], transition: { repeat: Infinity, duration: 3, ease: 'easeInOut' } }
-                : { scale: 1 }
+                ? { y: [0, -10, 0], transition: { repeat: Infinity, duration: 3, ease: 'easeInOut' } }
+                : { y: 0 }
             }
           >
             {/* The Back (Inside) */}
@@ -84,8 +88,12 @@ export default function EnvelopeWelcome({ guestName, onOpen, onSequenceComplete 
               <span className={styles.cardInitials}>✦</span>
             </motion.div>
 
-            {/* The Front Body */}
-            <div className={styles.envelopeFront} />
+            {/* The Front Body (where the side and bottom flaps fold in) */}
+            <div className={styles.envelopeFront}>
+              <div className={styles.envelopeLeftFlap} />
+              <div className={styles.envelopeRightFlap} />
+              <div className={styles.envelopeBottomFlap} />
+            </div>
 
             {/* The Top Flap (flips open) */}
             <motion.div
@@ -94,6 +102,7 @@ export default function EnvelopeWelcome({ guestName, onOpen, onSequenceComplete 
               transition={{ duration: 0.8, ease: 'easeInOut' }}
               style={{ transformOrigin: 'top', backfaceVisibility: 'hidden' }}
             >
+              <div className={styles.envelopeFlapShape} />
               <div className={styles.waxSeal}>
                 <div className={styles.waxSealInner}>
                   <span className={styles.waxSealLetter}>W</span>
