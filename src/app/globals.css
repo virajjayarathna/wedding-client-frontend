@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+@theme {
+  --color-ivory: #FDFBF7;
+  --color-cream: #F8F4EC;
+  --color-gold: #D4AF37;
+  --color-gold-light: #E6D5B8;
+  --color-charcoal: #333230;
+  --color-earth: #8C7863;
+  --font-serif: "Playfair Display", "Cormorant Garamond", serif;
+  --font-script: "Great Vibes", cursive;
+  --font-sans: "Montserrat", "Inter", sans-serif;
+}
+
 :root {
   /* Backgrounds */
   --bg-ivory: #FDFBF7;
