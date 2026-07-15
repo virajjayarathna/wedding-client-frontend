@@ -16,8 +16,19 @@ export default function ContactSection({ contacts }: ContactSectionProps) {
   if (!contacts || contacts.length === 0) return null;
 
   const formatWhatsApp = (phone: string) => {
-    // Remove all non-numeric characters (e.g. +, -, spaces) for the wa.me link
-    return phone.replace(/\D/g, '');
+    // Remove all non-numeric characters (e.g. +, -, spaces)
+    let cleaned = phone.replace(/\D/g, '');
+    
+    // If the user entered an international prefix (00), strip it
+    if (cleaned.startsWith('00')) {
+      cleaned = cleaned.substring(2);
+    } 
+    // If it's a local 10-digit number starting with 0, assume Sri Lanka (+94)
+    else if (cleaned.startsWith('0') && cleaned.length === 10) {
+      cleaned = '94' + cleaned.substring(1);
+    }
+    
+    return cleaned;
   };
 
   return (
