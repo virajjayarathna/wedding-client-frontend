@@ -2,7 +2,6 @@
 
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { format } from 'date-fns';
-import { Calendar } from 'lucide-react';
 
 interface HeroSectionProps {
   wedding: any;
@@ -16,24 +15,6 @@ export default function HeroSection({ wedding }: HeroSectionProps) {
     ? format(new Date(wedding.weddingDate), 'EEEE, MMMM do, yyyy') 
     : '';
 
-  // Google Calendar Link generator
-  const getGoogleCalendarUrl = () => {
-    if (!wedding.weddingDate) return '#';
-    const startDate = new Date(wedding.weddingDate);
-    const endDate = new Date(startDate.getTime() + 4 * 60 * 60 * 1000); // Assume 4 hours long
-
-    const formatDate = (d: Date) => d.toISOString().replace(/-|:|\.\d\d\d/g, '');
-    
-    const params = new URLSearchParams({
-      action: 'TEMPLATE',
-      text: `Wedding of ${wedding.brideName} & ${wedding.groomName}`,
-      dates: `${formatDate(startDate)}/${formatDate(endDate)}`,
-      details: 'We cannot wait to celebrate with you!',
-      location: wedding.venueAddress || wedding.venueName || '',
-    });
-
-    return `https://calendar.google.com/calendar/render?${params.toString()}`;
-  };
 
   return (
     <section className="relative h-[100svh] w-full flex items-center justify-center overflow-hidden">
@@ -69,18 +50,7 @@ export default function HeroSection({ wedding }: HeroSectionProps) {
             {weddingDateStr} • {wedding.venueName || 'Sri Lanka'}
           </p>
 
-          {wedding.weddingDate && (
-            <motion.a 
-              href={getGoogleCalendarUrl()}
-              target="_blank"
-              rel="noopener noreferrer"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-sm hover:bg-white/20 transition-colors shadow-lg"
-            >
-              <Calendar size={16} /> Add to Calendar
-            </motion.a>
-          )}
+
         </motion.div>
       </div>
 

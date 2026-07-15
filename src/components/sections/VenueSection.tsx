@@ -13,6 +13,25 @@ export default function VenueSection({ wedding }: VenueSectionProps) {
     ? format(new Date(wedding.weddingDate), 'EEEE, MMMM do, yyyy') 
     : '';
 
+  // Google Calendar Link generator
+  const getGoogleCalendarUrl = () => {
+    if (!wedding.weddingDate) return '#';
+    const startDate = new Date(wedding.weddingDate);
+    const endDate = new Date(startDate.getTime() + 4 * 60 * 60 * 1000); // Assume 4 hours long
+
+    const formatDate = (d: Date) => d.toISOString().replace(/-|:|\.\d\d\d/g, '');
+    
+    const params = new URLSearchParams({
+      action: 'TEMPLATE',
+      text: `Wedding of ${wedding.brideName || ''} & ${wedding.groomName || ''}`,
+      dates: `${formatDate(startDate)}/${formatDate(endDate)}`,
+      details: 'We cannot wait to celebrate with you!',
+      location: wedding.venueAddress || wedding.venueName || '',
+    });
+
+    return `https://calendar.google.com/calendar/render?${params.toString()}`;
+  };
+
   return (
     <section id="location" className="py-24 bg-cream/30 relative overflow-hidden">
       <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
@@ -58,16 +77,28 @@ export default function VenueSection({ wedding }: VenueSectionProps) {
               <div>
                 <h4 className="font-serif text-xl mb-1 text-charcoal">{wedding.venueName || 'Venue TBD'}</h4>
                 <p className="font-sans text-charcoal/70 whitespace-pre-wrap leading-relaxed">{wedding.venueAddress}</p>
-                {wedding.venueMapsUrl && (
-                  <a 
-                    href={wedding.venueMapsUrl} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="inline-block mt-4 text-sm uppercase tracking-wider font-semibold text-gold hover:text-charcoal transition-colors border-b border-gold/50 pb-1"
-                  >
-                    View on Google Maps
-                  </a>
-                )}
+                <div className="mt-4 flex flex-col items-start gap-4">
+                  {wedding.venueMapsUrl && (
+                    <a 
+                      href={wedding.venueMapsUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="inline-block text-sm uppercase tracking-wider font-semibold text-gold hover:text-charcoal transition-colors border-b border-gold/50 pb-1"
+                    >
+                      View on Google Maps
+                    </a>
+                  )}
+                  {wedding.weddingDate && (
+                    <a 
+                      href={getGoogleCalendarUrl()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-sm uppercase tracking-wider font-semibold text-black hover:text-charcoal transition-colors border-b border-black/50 pb-1 mt-2"
+                    >
+                      <Calendar size={16} /> Add to Calendar
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
           </div>
