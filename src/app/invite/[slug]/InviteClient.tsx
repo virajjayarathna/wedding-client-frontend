@@ -66,16 +66,21 @@ export default function InviteClient() {
     }
   };
 
-  const handleOpenEnvelope = () => {
-    setIsEnvelopeOpen(true);
-    // Auto-play music if it's set up
+  const handleStartInteraction = () => {
+    // Auto-play music if it's set up, must be directly in the click handler for iOS
     if (audioRef.current) {
+      // Force load for mobile browsers
+      audioRef.current.load();
       audioRef.current.play().then(() => {
         setIsPlaying(true);
       }).catch(e => {
         console.error('Auto-play blocked:', e);
       });
     }
+  };
+
+  const handleSequenceComplete = () => {
+    setIsEnvelopeOpen(true);
   };
 
   if (loading) {
@@ -135,8 +140,8 @@ export default function InviteClient() {
       {!isEnvelopeOpen && (
         <EnvelopeWelcome 
           guestName={guestName} 
-          onOpen={handleOpenEnvelope} 
-          onSequenceComplete={() => {}}
+          onOpen={handleStartInteraction} 
+          onSequenceComplete={handleSequenceComplete}
         />
       )}
 

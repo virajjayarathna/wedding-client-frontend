@@ -157,10 +157,10 @@
   font-family: var(--font-serif);
   font-size: 32px;
   font-style: italic;
-  background: linear-gradient(to bottom, var(--gold-light), var(--gold-dark));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 2px 3px rgba(50,0,0,0.8));
+  color: #D4AF37; /* Solid gold color */
+  text-shadow: 
+    0 -1px 1px rgba(255,255,255,0.3),
+    0 1px 3px rgba(50,0,0,0.9);
   line-height: 1;
 }
 
