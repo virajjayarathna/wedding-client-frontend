@@ -204,27 +204,17 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 
 /* Section Backgrounds */
 .section-bg-card {
-  background-color: var(--bg-ivory);
-  background-image: radial-gradient(var(--gold-light) 1px, transparent 1px), linear-gradient(180deg, var(--bg-ivory) 0%, var(--bg-cream) 100%);
-  background-size: 20px 20px, 100% 100%;
+  background: linear-gradient(to bottom, transparent 0%, var(--bg-cream) 15%, var(--bg-cream) 85%, transparent 100%);
 }
 .section-bg-timeline {
-  background-color: var(--bg-ivory);
-  background-image: radial-gradient(var(--gold-light) 1px, transparent 1px), linear-gradient(135deg, var(--bg-cream) 0%, var(--bg-ivory) 50%, rgba(230, 213, 184, 0.4) 100%);
-  background-size: 20px 20px, 100% 100%;
+  background: linear-gradient(to right, transparent 0%, var(--bg-cream) 25%, var(--bg-ivory) 50%, var(--bg-cream) 75%, transparent 100%);
 }
 .section-bg-gallery {
-  background-color: var(--bg-ivory);
-  background-image: radial-gradient(var(--gold-light) 1px, transparent 1px), linear-gradient(135deg, rgba(230, 213, 184, 0.4) 0%, var(--bg-ivory) 50%, var(--bg-cream) 100%);
-  background-size: 20px 20px, 100% 100%;
+  background: radial-gradient(ellipse at center, var(--bg-cream) 0%, transparent 70%);
 }
 .section-bg-venue {
-  background-color: var(--bg-ivory);
-  background-image: radial-gradient(var(--gold-light) 1px, transparent 1px), linear-gradient(0deg, var(--bg-cream) 0%, var(--bg-ivory) 50%, rgba(230, 213, 184, 0.4) 100%);
-  background-size: 20px 20px, 100% 100%;
+  background: linear-gradient(to bottom, transparent 0%, var(--bg-cream) 30%, var(--bg-ivory) 70%, transparent 100%);
 }
 .section-bg-contact {
-  background-color: var(--bg-ivory);
-  background-image: radial-gradient(var(--gold-light) 1px, transparent 1px), linear-gradient(180deg, var(--bg-cream) 0%, var(--bg-ivory) 50%, rgba(230, 213, 184, 0.5) 100%);
-  background-size: 20px 20px, 100% 100%;
+  background: linear-gradient(to bottom, transparent 0%, var(--bg-cream) 40%, var(--bg-ivory) 100%);
 }
