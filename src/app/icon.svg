@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Soft ivory background -->
+  <rect width="512" height="512" rx="120" fill="#F8F5F0" />
+  
+  <!-- Elegant double border -->
+  <rect x="24" y="24" width="464" height="464" rx="96" stroke="#D4AF37" stroke-width="8" fill="none" />
+  <rect x="40" y="40" width="432" height="432" rx="80" stroke="#D4AF37" stroke-width="4" stroke-opacity="0.5" fill="none" />
+  
+  <!-- The W for Wedding, styled classically -->
+  <text x="256" y="360" font-family="'Times New Roman', Georgia, serif" font-size="280" font-weight="normal" font-style="italic" fill="#D4AF37" text-anchor="middle">W</text>
+  
+  <!-- Vintage star/sparkle at the top -->
+  <path d="M 256 80 L 264 120 L 304 128 L 264 136 L 256 176 L 248 136 L 208 128 L 248 120 Z" fill="#D4AF37" />
+</svg>
