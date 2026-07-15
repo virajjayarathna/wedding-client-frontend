@@ -18,6 +18,8 @@ export interface GuestDetails {
   attendingCount?: number | null;
   dietaryNotes?: string | null;
   rsvpSubmittedAt?: string | null;
+  brideRsvpContact: 'BRIDE' | 'BRIDE_FATHER';
+  groomRsvpContact: 'GROOM' | 'GROOM_FATHER';
 }
 
 export interface WeddingInfo {
@@ -34,6 +36,10 @@ export interface WeddingInfo {
   venueMapsUrl?: string | null;
   bridePhone?: string | null;
   groomPhone?: string | null;
+  brideFatherName?: string | null;
+  brideFatherPhone?: string | null;
+  groomFatherName?: string | null;
+  groomFatherPhone?: string | null;
   timeline: TimelineEvent[];
   musicUrl?: string | null;
   musicType?: MusicType | null;
