@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { Heart } from 'lucide-react';
 import { motion } from 'framer-motion';
-import api, { getErrorMessage } from '@/lib/api';
+import api, { getErrorMessage, API_URL } from '@/lib/api';
 import type { InvitePayload } from '@/lib/types';
 
 // Components
@@ -172,7 +172,7 @@ export default function InviteClient() {
           {/* Floating Navigation */}
           <FloatingNav 
             onRsvpClick={() => setIsRsvpModalOpen(true)}
-            pdfUrl={`/api/v1/invite/${token}/pdf`}
+            pdfUrl={`${API_URL}/invite/${token}/pdf`}
             onToggleMusic={wedding.musicUrl ? toggleAudio : undefined}
             isPlaying={isPlaying}
           />
