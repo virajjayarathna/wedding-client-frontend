@@ -12,7 +12,7 @@ export default function InvitationCard({ wedding, guestName }: InvitationCardPro
   const accentColor = wedding?.accentColor || '#E8E8E8';
 
   return (
-    <section className="py-24 px-4 md:px-6 relative z-10 w-full flex justify-center">
+    <section className="py-24 px-4 md:px-6 relative z-10 w-full flex justify-center section-bg-card">
       <motion.div 
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}

@@ -44,7 +44,7 @@ export default function LoveStoryGallery({ images, brideName = "RUWANTHI", groom
   };
 
   return (
-    <section id="gallery" className="py-24 px-4 md:px-6 relative z-10 bg-cream/30 overflow-hidden">
+    <section id="gallery" className="py-24 px-4 md:px-6 relative z-10 section-bg-gallery overflow-hidden">
       <div className="max-w-4xl mx-auto text-center mb-16">
         <motion.div 
           initial={{ opacity: 0, y: 20 }} 

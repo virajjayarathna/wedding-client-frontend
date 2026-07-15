@@ -201,3 +201,30 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 ::-webkit-scrollbar-track { background: var(--theme-bg); }
 ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.2); }
+
+/* Section Backgrounds */
+.section-bg-card {
+  background-color: var(--bg-ivory);
+  background-image: radial-gradient(var(--gold-light) 1px, transparent 1px), linear-gradient(180deg, var(--bg-ivory) 0%, var(--bg-cream) 100%);
+  background-size: 20px 20px, 100% 100%;
+}
+.section-bg-timeline {
+  background-color: var(--bg-ivory);
+  background-image: radial-gradient(var(--gold-light) 1px, transparent 1px), linear-gradient(135deg, var(--bg-cream) 0%, var(--bg-ivory) 50%, rgba(230, 213, 184, 0.4) 100%);
+  background-size: 20px 20px, 100% 100%;
+}
+.section-bg-gallery {
+  background-color: var(--bg-ivory);
+  background-image: radial-gradient(var(--gold-light) 1px, transparent 1px), linear-gradient(135deg, rgba(230, 213, 184, 0.4) 0%, var(--bg-ivory) 50%, var(--bg-cream) 100%);
+  background-size: 20px 20px, 100% 100%;
+}
+.section-bg-venue {
+  background-color: var(--bg-ivory);
+  background-image: radial-gradient(var(--gold-light) 1px, transparent 1px), linear-gradient(0deg, var(--bg-cream) 0%, var(--bg-ivory) 50%, rgba(230, 213, 184, 0.4) 100%);
+  background-size: 20px 20px, 100% 100%;
+}
+.section-bg-contact {
+  background-color: var(--bg-ivory);
+  background-image: radial-gradient(var(--gold-light) 1px, transparent 1px), linear-gradient(180deg, var(--bg-cream) 0%, var(--bg-ivory) 50%, rgba(230, 213, 184, 0.5) 100%);
+  background-size: 20px 20px, 100% 100%;
+}

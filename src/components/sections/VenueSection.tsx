@@ -33,7 +33,7 @@ export default function VenueSection({ wedding }: VenueSectionProps) {
   };
 
   return (
-    <section id="location" className="py-24 bg-cream/30 relative overflow-hidden">
+    <section id="location" className="py-24 section-bg-venue relative overflow-hidden">
       <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
         <motion.div 
           initial={{ opacity: 0, x: -40 }} 
@@ -77,13 +77,13 @@ export default function VenueSection({ wedding }: VenueSectionProps) {
               <div>
                 <h4 className="font-serif text-xl mb-1 text-charcoal">{wedding.venueName || 'Venue TBD'}</h4>
                 <p className="font-sans text-charcoal/70 whitespace-pre-wrap leading-relaxed">{wedding.venueAddress}</p>
-                <div className="mt-4 flex flex-col items-start gap-4">
+                <div className="mt-6 flex flex-col items-start gap-6">
                   {wedding.venueMapsUrl && (
                     <a 
                       href={wedding.venueMapsUrl} 
                       target="_blank" 
                       rel="noopener noreferrer" 
-                      className="inline-block text-sm uppercase tracking-wider font-semibold text-gold hover:text-charcoal transition-colors border-b border-gold/50 pb-1"
+                      className="inline-block text-sm uppercase tracking-wider font-semibold text-black hover:text-charcoal transition-colors border-b border-black/50 pb-1"
                     >
                       View on Google Maps
                     </a>
@@ -93,7 +93,7 @@ export default function VenueSection({ wedding }: VenueSectionProps) {
                       href={getGoogleCalendarUrl()}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-sm uppercase tracking-wider font-semibold text-black hover:text-charcoal transition-colors border-b border-black/50 pb-1 mt-2"
+                      className="inline-flex items-center gap-2 text-sm uppercase tracking-wider font-semibold text-black hover:text-charcoal transition-colors border-b border-black/50 pb-1"
                     >
                       <Calendar size={16} /> Add to Calendar
                     </a>
