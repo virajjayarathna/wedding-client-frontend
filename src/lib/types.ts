@@ -8,6 +8,12 @@ export interface TimelineEvent {
   description?: string;
 }
 
+export interface RsvpContact {
+  id: string;
+  name: string;
+  phone: string;
+}
+
 export interface GuestDetails {
   id: string;
   title: GuestTitle;
@@ -18,8 +24,8 @@ export interface GuestDetails {
   attendingCount?: number | null;
   dietaryNotes?: string | null;
   rsvpSubmittedAt?: string | null;
-  brideRsvpContact: 'BRIDE' | 'BRIDE_FATHER';
-  groomRsvpContact: 'GROOM' | 'GROOM_FATHER';
+  firstRsvpContact?: RsvpContact | null;
+  secondRsvpContact?: RsvpContact | null;
 }
 
 export interface WeddingInfo {

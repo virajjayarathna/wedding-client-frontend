@@ -109,20 +109,12 @@ export default function InviteClient() {
   const isFamily = guest.title === 'FAMILY';
   const guestName = isFamily ? `${TITLE_MAP[guest.title]} ${guest.lastName} Family` : `${TITLE_MAP[guest.title]} ${guest.firstName} ${guest.lastName}`;
 
-  // Build contacts array for ContactSection
-  const contacts = [];
-  
-  if (guest.brideRsvpContact === 'BRIDE_FATHER' && wedding.brideFatherPhone) {
-    contacts.push({ name: wedding.brideFatherName || "Bride's Father", phone: wedding.brideFatherPhone });
-  } else if (wedding.bridePhone) {
-    contacts.push({ name: wedding.brideName, phone: wedding.bridePhone });
-  }
-
-  if (guest.groomRsvpContact === 'GROOM_FATHER' && wedding.groomFatherPhone) {
-    contacts.push({ name: wedding.groomFatherName || "Groom's Father", phone: wedding.groomFatherPhone });
-  } else if (wedding.groomPhone) {
-    contacts.push({ name: wedding.groomName, phone: wedding.groomPhone });
-  }
+  // Build contacts array for ContactSection from the guest's assigned RSVP
+  // contacts (configured by the admin under Wedding Editor → Venue & RSVP,
+  // and resolved server-side to {name, phone}).
+  const contacts = [guest.firstRsvpContact, guest.secondRsvpContact].filter(
+    (c): c is { id: string; name: string; phone: string } => !!c
+  );
 
   return (
     <main className="min-h-screen bg-ivory text-charcoal font-sans relative">
