@@ -53,9 +53,9 @@ export default function InvitationCard({ wedding, guestName }: InvitationCardPro
           </div>
         )}
 
-        <div className="font-serif text-[11px] md:text-[13px] tracking-[2px] uppercase text-[#333333] mb-4 md:mb-6 leading-[1.8] relative z-10" style={{ fontFamily: "'Playfair Display', serif" }}>
+        <div className="font-serif text-[11px] md:text-[13px] tracking-[2px] uppercase text-[#333333] mb-3 md:mb-4 leading-[1.3] relative z-10" style={{ fontFamily: "'Playfair Display', serif" }}>
           MR. &amp; MRS. {wedding?.brideFatherName?.toUpperCase() || ''}<br/>
-          <span className="inline-block my-2 text-[11px] md:text-[13px] tracking-[2px]">TOGETHER WITH</span><br/>
+          <span className="inline-block my-0.5 text-[11px] md:text-[13px] tracking-[2px]">TOGETHER WITH</span><br/>
           MR. &amp; MRS. {wedding?.groomFatherName?.toUpperCase() || ''}
         </div>
 

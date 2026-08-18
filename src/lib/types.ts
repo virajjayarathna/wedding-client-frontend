@@ -52,6 +52,8 @@ export interface WeddingInfo {
   primaryColor: string;
   accentColor: string;
   fontFamily: string;
+  pdfLogoUrl?: string | null;
+  pdfFont?: string | null;
 }
 
 export interface InvitePayload {
