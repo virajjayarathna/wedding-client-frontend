@@ -12,8 +12,9 @@ const DEFAULT_DESCRIPTION = 'You are invited to celebrate our special day.';
 
 /**
  * Per-guest Open Graph metadata so sharing an invite link (e.g. via WhatsApp)
- * renders a rich preview card — couple names, wedding date, and the cover/hero
- * photo — instead of the generic text-only link preview.
+ * renders a rich preview card — couple names, wedding date, and a representative
+ * image (cover photo, hero photo, or the custom PDF-tab logo) — instead of the
+ * generic text-only link preview.
  */
 export async function generateMetadata({ params }: InvitePageProps): Promise<Metadata> {
   const { slug } = await params;
@@ -30,8 +31,10 @@ export async function generateMetadata({ params }: InvitePageProps): Promise<Met
       ? new Date(wedding.weddingDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
       : '';
     const description = `You are cordially invited to the wedding of ${wedding.brideName} & ${wedding.groomName}${weddingDate ? ` on ${weddingDate}` : ''}. View your invitation and RSVP here.`;
-    // Prefer the cover photo (matches what guests see first on the page), fall back to the hero photo.
-    const image: string | undefined = wedding.coverPhotoUrl || wedding.heroPhotoUrl || undefined;
+    // Prefer the cover photo (matches what guests see first on the page), then the hero
+    // photo, and finally the custom logo uploaded under the PDF tab — so a wedding with
+    // no photos yet still gets a branded image in the WhatsApp/social preview card.
+    const image: string | undefined = wedding.coverPhotoUrl || wedding.heroPhotoUrl || wedding.pdfLogoUrl || undefined;
 
     return {
       title,
