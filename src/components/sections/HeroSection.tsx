@@ -17,7 +17,7 @@ export default function HeroSection({ wedding }: HeroSectionProps) {
 
 
   return (
-    <section className="relative h-[100svh] w-full flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-screen w-full flex items-center justify-center overflow-hidden">
       <motion.div style={{ y }} className="absolute inset-0 z-0">
         {wedding.coverPhotoUrl ? (
           <img 

@@ -2,6 +2,13 @@
   "name": "wedding-client-frontend",
   "version": "0.1.0",
   "private": true,
+  "browserslist": [
+    "iOS >= 13",
+    "Safari >= 13",
+    "> 0.3%",
+    "last 4 versions",
+    "not dead"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
