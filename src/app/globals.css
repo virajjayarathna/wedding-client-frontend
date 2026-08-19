@@ -1,8 +1,26 @@
 @import "tailwindcss";
 
+/*
+ * THEMING
+ * -------
+ * Everything below is written against custom properties, never literal colours.
+ * The invite page emits a `:root { … }` block at request time (see
+ * src/lib/theme.ts and app/invite/[slug]/page.tsx) that overrides these values
+ * with the couple's chosen palette. That later block wins on document order at
+ * equal specificity, so no !important and no per-component prop threading.
+ *
+ * The values here are the Classic Gold preset and act as the defaults for any
+ * page that renders outside the invite route.
+ *
+ * Names come in two flavours on purpose: `--color-*` / `--font-*` are Tailwind
+ * v4 `@theme` tokens, so utilities (`text-gold`, `bg-cream/50`) resolve to
+ * var() and follow the theme automatically. The bare `--gold` / `--bg-ivory`
+ * names are what the hand-written rules below and the CSS modules use.
+ */
 @theme {
   --color-ivory: #FDFBF7;
   --color-cream: #F8F4EC;
+  --color-card: #FFFFFF;
   --color-gold: #D4AF37;
   --color-gold-light: #E6D5B8;
   --color-charcoal: #333230;
@@ -16,23 +34,38 @@
   /* Backgrounds */
   --bg-ivory: #FDFBF7;
   --bg-cream: #F8F4EC;
-  
+  --card: #FFFFFF;
+
   /* Accents */
   --gold: #D4AF37;
   --gold-light: #E6D5B8;
+  --gold-dark: #997d28;
   --charcoal: #333230;
   --earth-brown: #8C7863;
-  
+
+  /* Derived — recomputed per theme so they track the accent colour */
+  --on-primary: #ffffff;
+  --primary-soft: rgba(212, 175, 55, 0.12);
+  --primary-ring: rgba(212, 175, 55, 0.28);
+  --hairline: rgba(51, 50, 48, 0.1);
+
+  /* Envelope paper and wax seal */
+  --envelope-paper: #d8c7a6;
+  --envelope-paper-dark: #c3b08c;
+  --seal: #961111;
+  --seal-light: #d13030;
+  --seal-dark: #4a0404;
+
   /* Typography */
   --font-serif: 'Playfair Display', 'Cormorant Garamond', serif;
   --font-script: 'Great Vibes', cursive;
   --font-sans: 'Montserrat', 'Inter', sans-serif;
-  
-  /* Legacy/Dynamic fallbacks if needed */
+
+  /* Legacy aliases */
   --theme-primary: var(--gold);
   --theme-accent: var(--gold-light);
   --theme-bg: var(--bg-ivory);
-  --theme-surface: #ffffff;
+  --theme-surface: var(--card);
   --theme-text-dark: var(--charcoal);
   --theme-text-light: #ffffff;
 }
@@ -59,8 +92,8 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 .input-field {
   width: 100%;
   padding: 12px 16px;
-  background: var(--theme-surface);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: var(--card);
+  border: 1px solid var(--hairline);
   border-radius: 8px;
   outline: none;
   transition: all 0.2s ease;
@@ -69,7 +102,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 }
 .input-field:focus {
   border-color: var(--gold);
-  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+  box-shadow: 0 0 0 3px var(--primary-soft);
 }
 
 /* Buttons */
@@ -79,7 +112,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   justify-content: center;
   padding: 14px 28px;
   background: linear-gradient(135deg, var(--gold-light), var(--gold));
-  color: #fff;
+  color: var(--on-primary);
   font-weight: 600;
   font-family: var(--font-sans);
   border-radius: 8px;
@@ -106,7 +139,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   justify-content: center;
   padding: 14px 28px;
   background: var(--charcoal);
-  color: #fff;
+  color: var(--theme-text-light);
   font-weight: 600;
   font-family: var(--font-sans);
   border-radius: 8px;
@@ -119,7 +152,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 }
 .btn-charcoal:active:not(:disabled) {
   transform: translateY(1px);
-  background: #222;
+  filter: brightness(0.9);
 }
 
 .btn-earth {
@@ -128,7 +161,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   justify-content: center;
   padding: 14px 28px;
   background: var(--earth-brown);
-  color: #fff;
+  color: var(--theme-text-light);
   font-weight: 600;
   font-family: var(--font-sans);
   border-radius: 8px;
@@ -141,7 +174,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 }
 .btn-earth:active:not(:disabled) {
   transform: translateY(1px);
-  background: #73604f;
+  filter: brightness(0.9);
 }
 
 .btn-outline-gold {
@@ -162,16 +195,18 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   letter-spacing: 1px;
 }
 .btn-outline-gold:active:not(:disabled) {
-  background: rgba(212, 175, 55, 0.1);
+  background: var(--primary-soft);
 }
 
 /* Utilities */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.15);
+  /* color-mix keeps the frosted panel legible on both light and dark themes:
+     it tints toward the card colour rather than assuming a white page. */
+  background: color-mix(in srgb, var(--card) 55%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  border: 1px solid color-mix(in srgb, var(--gold-light) 45%, transparent);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
 }
 
 .paper-texture {
@@ -180,9 +215,9 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 }
 
 .card-elegant {
-  background: #FFFFFF;
+  background: var(--card);
   border: 2px solid var(--gold);
-  box-shadow: inset 0 0 0 4px #fff, inset 0 0 0 5px var(--gold), 0 10px 30px rgba(0,0,0,0.05);
+  box-shadow: inset 0 0 0 4px var(--card), inset 0 0 0 5px var(--gold), 0 10px 30px rgba(0,0,0,0.05);
   position: relative;
 }
 
@@ -199,8 +234,8 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 /* Hide scrollbar for clean aesthetic */
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--theme-bg); }
-::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.2); }
+::-webkit-scrollbar-thumb { background: var(--hairline); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-light); }
 
 /* Section Backgrounds */
 .section-bg-card {

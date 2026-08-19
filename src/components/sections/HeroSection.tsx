@@ -28,8 +28,13 @@ export default function HeroSection({ wedding }: HeroSectionProps) {
         ) : (
           <div className="w-full h-full bg-cream" />
         )}
-        {/* Soft overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-charcoal/20 via-charcoal/40 to-charcoal/60" />
+        {/*
+          Scrim for text readability. Deliberately black rather than the theme's
+          ink colour: the hero copy is always white over a photograph, and on a
+          dark theme --color-charcoal is a *light* cream, which would turn this
+          into a white wash and make the names disappear.
+        */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/25 via-black/45 to-black/65" />
       </motion.div>
 
       <div className="relative z-10 text-center px-6 flex flex-col items-center mt-20 md:mt-0">

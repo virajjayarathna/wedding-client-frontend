@@ -125,8 +125,8 @@ export default function LoveStoryGallery({ images, brideName = "RUWANTHI", groom
                 >
                   <div className={`${styles.pageFront} ${styles.coverFront}`}>
                     <div className={styles.embossedText}>
-                      <p className="font-serif text-xl italic mb-4" style={{ color: '#D4AF37' }}>The Union of</p>
-                      <h2 className="font-serif text-3xl md:text-4xl" style={{ color: '#F1D570' }}>{groomName.toUpperCase()} & {brideName.toUpperCase()}</h2>
+                      <p className="font-serif text-xl italic mb-4" style={{ color: 'var(--gold)' }}>The Union of</p>
+                      <h2 className="font-serif text-3xl md:text-4xl" style={{ color: 'var(--gold-light)' }}>{groomName.toUpperCase()} & {brideName.toUpperCase()}</h2>
                     </div>
                     <div className={`${styles.goldFiligree} my-8`} />
                     <div className={styles.embossedText}>

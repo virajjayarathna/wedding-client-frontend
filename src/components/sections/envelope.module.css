@@ -25,7 +25,7 @@
 .envelopeBack {
   position: absolute;
   inset: 0;
-  background: #c3b08c; /* Darker vintage interior */
+  background: var(--envelope-paper-dark); /* Darker vintage interior */
   border-radius: 4px;
   box-shadow: inset 0 0 50px rgba(50,30,0,0.4);
 }
@@ -37,7 +37,7 @@
   right: 5%;
   top: 5%;
   bottom: 5%;
-  background: #FFFFFF;
+  background: var(--card);
   border: 1px solid var(--gold-light);
   border-radius: 4px;
   display: flex;
@@ -76,7 +76,7 @@
 .envelopeBottomFlap {
   position: absolute;
   inset: 0;
-  background-color: #d8c7a6;
+  background-color: var(--envelope-paper);
   background-image: 
     url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.12'/%3E%3C/svg%3E");
 }
@@ -114,7 +114,7 @@
 .envelopeFlapShape {
   position: absolute;
   inset: 0;
-  background-color: #d8c7a6;
+  background-color: var(--envelope-paper);
   background-image: 
     radial-gradient(circle at 50% 10%, rgba(255,255,255,0.1) 0%, rgba(90, 60, 20, 0.1) 100%),
     url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.12'/%3E%3C/svg%3E");
@@ -128,7 +128,7 @@
   transform: translateX(-50%);
   width: 70px;
   height: 70px;
-  background: radial-gradient(circle at 35% 35%, #d13030, #961111 55%, #4a0404);
+  background: radial-gradient(circle at 35% 35%, var(--seal-light), var(--seal) 55%, var(--seal-dark));
   border-radius: 50%;
   box-shadow: 
     inset 0 0 8px rgba(255,100,100,0.4),
@@ -157,7 +157,7 @@
   font-family: var(--font-serif);
   font-size: 32px;
   font-style: italic;
-  color: #D4AF37; /* Solid gold color */
+  color: var(--gold); /* Follows the theme accent */
   text-shadow: 
     0 -1px 1px rgba(255,255,255,0.3),
     0 1px 3px rgba(50,0,0,0.9);

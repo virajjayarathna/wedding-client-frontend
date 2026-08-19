@@ -96,7 +96,7 @@ export default function InviteClient() {
   if (error || !data) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6 text-center bg-ivory">
-        <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full border border-gold-light/20">
+        <div className="bg-card p-8 rounded-2xl shadow-xl max-w-md w-full border border-gold-light/20">
           <div className="text-4xl mb-4">💌</div>
           <h1 className="text-2xl font-serif mb-2 text-charcoal">Invitation Unavailable</h1>
           <p className="text-charcoal/60 font-sans">{error || 'Could not load invitation.'}</p>

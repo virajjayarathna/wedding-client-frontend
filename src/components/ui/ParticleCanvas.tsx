@@ -19,11 +19,30 @@ interface Particle {
   opacity: number;
 }
 
-const COLORS = {
-  petal: ['#FFD1DC', '#FFB7C5', '#FFE4E1'], // Soft pinks
-  heart: ['#FFC0CB', '#FFB6C1'],           // Slightly deeper pinks
-  leaf: ['#E8F4E6', '#D0F0C0', '#F5F5DC'], // Very soft sage green / beige
-};
+/**
+ * Falling petals are drawn to a canvas, so they can't pick up CSS variables the
+ * way the rest of the page does. Sample the resolved theme once per mount and
+ * tint them to it — a pink petal drifting over an emerald or midnight
+ * invitation is the one thing that gives away a bolted-on theme.
+ *
+ * The fallbacks reproduce the original pinks, so this degrades to the old look
+ * if the variables are somehow absent.
+ */
+function readThemeColors(): Record<'petal' | 'heart' | 'leaf', string[]> {
+  const css = getComputedStyle(document.documentElement);
+  const token = (name: string, fallback: string) => css.getPropertyValue(name).trim() || fallback;
+
+  const primary = token('--gold', '#D4AF37');
+  const primaryLight = token('--gold-light', '#E6D5B8');
+  const paper = token('--envelope-paper', '#FFE4E1');
+  const muted = token('--earth-brown', '#8C7863');
+
+  return {
+    petal: [primaryLight, paper, primary],
+    heart: [primary, primaryLight],
+    leaf: [primaryLight, muted, paper],
+  };
+}
 
 export default function ParticleCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -42,6 +61,7 @@ export default function ParticleCanvas() {
     const particleCount = isMobile ? 15 : 30;
     
     let particles: Particle[] = [];
+    const COLORS = readThemeColors();
 
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;

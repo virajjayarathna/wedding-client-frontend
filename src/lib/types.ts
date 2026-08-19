@@ -52,8 +52,22 @@ export interface WeddingInfo {
   musicUrl?: string | null;
   musicType?: MusicType | null;
   primaryColor: string;
+  // ── Theme ──────────────────────────────────────────────────────────────
+  // Resolved into CSS custom properties by src/lib/theme.ts. Every field is
+  // optional at runtime: unset ones fall back to the named preset, and an
+  // unknown preset falls back to Classic Gold — so weddings created before
+  // theming existed keep rendering exactly as they did.
+  /** id of a THEME_PRESETS entry, e.g. 'emerald'. */
+  themePreset?: string | null;
   accentColor: string;
+  /** Heading font family. */
   fontFamily: string;
+  bodyFont?: string | null;
+  bgColor?: string | null;
+  surfaceColor?: string | null;
+  cardColor?: string | null;
+  textColor?: string | null;
+  mutedColor?: string | null;
   pdfLogoUrl?: string | null;
   pdfFont?: string | null;
 }

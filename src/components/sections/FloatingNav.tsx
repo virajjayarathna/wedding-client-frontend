@@ -82,7 +82,7 @@ export default function FloatingNav({ onRsvpClick, pdfUrl, onToggleMusic, isPlay
 
       <button
         onClick={onRsvpClick}
-        className="flex items-center gap-2 px-6 h-12 rounded-full bg-gradient-to-r from-gold to-champagne text-charcoal font-medium shadow-md hover:shadow-lg transition-all"
+        className="flex items-center gap-2 px-6 h-12 rounded-full bg-gradient-to-r from-gold-light to-gold text-[color:var(--on-primary)] font-medium shadow-md hover:shadow-lg transition-all"
       >
         <Mail size={16} />
         RSVP

@@ -42,7 +42,7 @@ export default function VenueSection({ wedding }: VenueSectionProps) {
           transition={{ duration: 0.8 }}
         >
           {wedding.heroPhotoUrl ? (
-            <div className="rounded-2xl overflow-hidden shadow-2xl relative aspect-[4/5] border border-gold-light/30 p-2 bg-white">
+            <div className="rounded-2xl overflow-hidden shadow-2xl relative aspect-[4/5] border border-gold-light/30 p-2 bg-card">
               <img src={wedding.heroPhotoUrl} alt="The Couple" className="w-full h-full object-cover rounded-xl" />
             </div>
           ) : (

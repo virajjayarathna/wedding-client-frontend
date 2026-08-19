@@ -42,7 +42,21 @@ export default function RsvpModal({
         notes,
       });
       if (rsvpStatus === 'ATTENDING') {
-        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#D4AF37', '#E6D5B8', '#333230'] });
+        // Confetti is drawn on a canvas, so it can't inherit CSS variables —
+        // read the live theme values off the document instead of hard-coding gold.
+        const css = getComputedStyle(document.documentElement);
+        const themeColor = (name: string, fallback: string) =>
+          css.getPropertyValue(name).trim() || fallback;
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: [
+            themeColor('--gold', '#D4AF37'),
+            themeColor('--gold-light', '#E6D5B8'),
+            themeColor('--charcoal', '#333230'),
+          ],
+        });
         toast.success("Yay! We can't wait to see you! 🎉");
       } else {
         toast.success("RSVP submitted successfully.");
@@ -102,7 +116,7 @@ export default function RsvpModal({
                       className={`flex items-center justify-center gap-3 h-14 rounded-xl border transition-all ${
                         rsvpStatus === opt.val
                           ? 'border-gold bg-gold/10 text-charcoal shadow-sm'
-                          : 'border-charcoal/10 bg-cream text-charcoal/60 hover:bg-white hover:border-gold-light'
+                          : 'border-charcoal/10 bg-cream text-charcoal/60 hover:bg-card hover:border-gold-light'
                       }`}
                     >
                       {opt.icon} <span className="font-medium text-base">{opt.label}</span>
@@ -118,9 +132,9 @@ export default function RsvpModal({
                   </label>
                   <p className="text-xs text-charcoal/50 mb-3">You can bring up to {guest.maxAttendants} guests.</p>
                   <div className="flex items-center gap-4">
-                    <button type="button" onClick={() => setAttendants(Math.max(1, attendants - 1))} className="w-12 h-12 rounded-xl bg-cream border border-charcoal/10 flex items-center justify-center text-charcoal hover:bg-white">-</button>
+                    <button type="button" onClick={() => setAttendants(Math.max(1, attendants - 1))} className="w-12 h-12 rounded-xl bg-cream border border-charcoal/10 flex items-center justify-center text-charcoal hover:bg-card">-</button>
                     <span className="text-2xl font-serif w-8 text-center">{attendants}</span>
-                    <button type="button" onClick={() => setAttendants(Math.min(guest.maxAttendants, attendants + 1))} className="w-12 h-12 rounded-xl bg-cream border border-charcoal/10 flex items-center justify-center text-charcoal hover:bg-white">+</button>
+                    <button type="button" onClick={() => setAttendants(Math.min(guest.maxAttendants, attendants + 1))} className="w-12 h-12 rounded-xl bg-cream border border-charcoal/10 flex items-center justify-center text-charcoal hover:bg-card">+</button>
                   </div>
                 </motion.div>
               )}
@@ -133,7 +147,7 @@ export default function RsvpModal({
                     placeholder="e.g. Vegetarian, Nut allergy (Leave blank if none)"
                     value={dietary}
                     onChange={e => setDietary(e.target.value)}
-                    className="w-full bg-cream border border-charcoal/10 rounded-xl px-4 h-14 text-charcoal placeholder-charcoal/30 outline-none focus:border-gold focus:bg-white transition-all"
+                    className="w-full bg-cream border border-charcoal/10 rounded-xl px-4 h-14 text-charcoal placeholder-charcoal/30 outline-none focus:border-gold focus:bg-card transition-all"
                   />
                 </div>
                 <div>
@@ -143,7 +157,7 @@ export default function RsvpModal({
                     rows={3}
                     value={notes}
                     onChange={e => setNotes(e.target.value)}
-                    className="w-full bg-cream border border-charcoal/10 rounded-xl px-4 py-3 text-charcoal placeholder-charcoal/30 outline-none focus:border-gold focus:bg-white transition-all resize-none"
+                    className="w-full bg-cream border border-charcoal/10 rounded-xl px-4 py-3 text-charcoal placeholder-charcoal/30 outline-none focus:border-gold focus:bg-card transition-all resize-none"
                   />
                 </div>
               </div>

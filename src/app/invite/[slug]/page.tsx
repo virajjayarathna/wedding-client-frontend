@@ -1,7 +1,8 @@
-import { Suspense } from 'react';
+import { Suspense, cache } from 'react';
 import type { Metadata } from 'next';
 import InviteClient from './InviteClient';
 import { API_URL } from '@/lib/api';
+import { weddingThemeCss } from '@/lib/theme';
 
 interface InvitePageProps {
   params: Promise<{ slug: string }>;
@@ -15,6 +16,24 @@ const DEFAULT_DESCRIPTION = 'You are invited to celebrate our special day.';
  * so a shared link never degrades to the bare text-only preview card.
  */
 const FALLBACK_OG_IMAGE = '/og-fallback.jpg';
+
+/**
+ * Server-side fetch of the invite, shared by generateMetadata and the page
+ * itself. Wrapped in React's `cache` so the two callers hit the API once per
+ * request rather than twice. Returns null instead of throwing — an invalid or
+ * expired token is a normal outcome here, and the client component renders the
+ * real error state.
+ */
+const getInvite = cache(async (slug: string) => {
+  try {
+    const res = await fetch(`${API_URL}/invite/${slug}`, { cache: 'no-store' });
+    if (!res.ok) return null;
+    const json = await res.json();
+    return json?.data?.wedding ?? null;
+  } catch {
+    return null;
+  }
+});
 
 /**
  * Picks the image WhatsApp / Facebook / Viber will show for a shared invite link.
@@ -50,42 +69,11 @@ function pickOgImage(wedding: {
  */
 export async function generateMetadata({ params }: InvitePageProps): Promise<Metadata> {
   const { slug } = await params;
+  const wedding = await getInvite(slug);
 
-  try {
-    const res = await fetch(`${API_URL}/invite/${slug}`, { cache: 'no-store' });
-    if (!res.ok) throw new Error('Invite not found');
-    const json = await res.json();
-    const wedding = json?.data?.wedding;
-    if (!wedding?.brideName || !wedding?.groomName) throw new Error('Invite not found');
-
-    const title = `${wedding.brideName} & ${wedding.groomName}'s Wedding`;
-    const weddingDate = wedding.weddingDate
-      ? new Date(wedding.weddingDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
-      : '';
-    const description = `You are cordially invited to the wedding of ${wedding.brideName} & ${wedding.groomName}${weddingDate ? ` on ${weddingDate}` : ''}. View your invitation and RSVP here.`;
-
-    const image = pickOgImage(wedding);
-
-    return {
-      title,
-      description,
-      openGraph: {
-        title,
-        description,
-        type: 'website',
-        siteName: title,
-        images: [{ url: image.url, width: image.width, height: image.height, alt: title }],
-      },
-      twitter: {
-        card: 'summary_large_image',
-        title,
-        description,
-        images: [image.url],
-      },
-    };
-  } catch {
-    // Invalid/expired token, unpublished wedding, or the API being unreachable —
-    // fall back to the generic metadata rather than leaking an error.
+  // Invalid/expired token, unpublished wedding, or the API being unreachable —
+  // fall back to the generic metadata rather than leaking an error.
+  if (!wedding?.brideName || !wedding?.groomName) {
     return {
       title: DEFAULT_TITLE,
       description: DEFAULT_DESCRIPTION,
@@ -97,13 +85,50 @@ export async function generateMetadata({ params }: InvitePageProps): Promise<Met
       },
     };
   }
+
+  const title = `${wedding.brideName} & ${wedding.groomName}'s Wedding`;
+  const weddingDate = wedding.weddingDate
+    ? new Date(wedding.weddingDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+    : '';
+  const description = `You are cordially invited to the wedding of ${wedding.brideName} & ${wedding.groomName}${weddingDate ? ` on ${weddingDate}` : ''}. View your invitation and RSVP here.`;
+
+  const image = pickOgImage(wedding);
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      siteName: title,
+      images: [{ url: image.url, width: image.width, height: image.height, alt: title }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [image.url],
+    },
+  };
 }
 
-// Server Component Wrapper
-export default function InvitePage() {
+export default async function InvitePage({ params }: InvitePageProps) {
+  const { slug } = await params;
+
+  // Resolved on the server so the themed palette is in the HTML from the first
+  // paint. Doing this client-side after the invite data loads would show every
+  // guest a flash of the default gold palette before their couple's theme
+  // swapped in — most visible on the envelope, which is the first thing they see.
+  const wedding = await getInvite(slug);
+  const themeCssText = weddingThemeCss(wedding);
+
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gray-500">Loading your invitation...</div>}>
-      <InviteClient />
-    </Suspense>
+    <>
+      <style id="wedding-theme" dangerouslySetInnerHTML={{ __html: themeCssText }} />
+      <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gray-500">Loading your invitation...</div>}>
+        <InviteClient />
+      </Suspense>
+    </>
   );
 }
