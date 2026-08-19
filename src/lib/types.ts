@@ -36,6 +36,8 @@ export interface WeddingInfo {
   loveStory?: string | null;
   coverPhotoUrl?: string | null;
   heroPhotoUrl?: string | null;
+  /** 1200x630 image used as og:image for WhatsApp / social link previews. */
+  sharePreviewUrl?: string | null;
   galleryUrls: string[];
   venueName?: string | null;
   venueAddress?: string | null;
