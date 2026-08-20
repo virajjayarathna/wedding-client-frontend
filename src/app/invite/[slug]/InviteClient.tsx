@@ -21,7 +21,7 @@ import Footer from '@/components/sections/Footer';
 import FloatingNav from '@/components/sections/FloatingNav';
 import RsvpModal from '@/components/sections/RsvpModal';
 
-const TITLE_MAP: Record<string, string> = { MR: 'Mr.', MRS: 'Mrs.', MS: 'Ms.', DR: 'Dr.', FAMILY: 'The', MASTER: 'Master' };
+const TITLE_MAP: Record<string, string> = { MR: 'Mr.', MRS: 'Mrs.', MR_AND_MRS: 'Mr. & Mrs.', MS: 'Ms.', DR: 'Dr.', FAMILY: 'The', MASTER: 'Master' };
 
 export default function InviteClient() {
   const params = useParams();
