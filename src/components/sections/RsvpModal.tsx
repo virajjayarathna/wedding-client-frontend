@@ -29,8 +29,11 @@ export default function RsvpModal({
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
+  const deadlinePassed = !!wedding.rsvpDeadline && new Date() > new Date(wedding.rsvpDeadline);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (deadlinePassed) return toast.error('The RSVP deadline has passed.');
     if (!rsvpStatus) return toast.error('Please select your attendance status');
     
     setSubmitting(true);
@@ -101,6 +104,12 @@ export default function RsvpModal({
               </button>
             </div>
 
+            {deadlinePassed ? (
+              <div className="p-6 md:p-8 text-center space-y-2">
+                <p className="text-charcoal font-medium text-lg">The RSVP deadline has passed.</p>
+                <p className="text-charcoal/60 text-sm">Please contact the couple directly if your plans have changed.</p>
+              </div>
+            ) : (
             <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-8">
               <div>
                 <label className="block text-sm font-medium text-charcoal/80 mb-4">Will you be attending?</label>
@@ -176,6 +185,7 @@ export default function RsvpModal({
                 </button>
               </div>
             </form>
+            )}
           </motion.div>
         </div>
       )}

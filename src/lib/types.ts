@@ -42,6 +42,7 @@ export interface WeddingInfo {
   venueName?: string | null;
   venueAddress?: string | null;
   venueMapsUrl?: string | null;
+  rsvpDeadline?: string | null;
   bridePhone?: string | null;
   groomPhone?: string | null;
   brideFatherName?: string | null;
