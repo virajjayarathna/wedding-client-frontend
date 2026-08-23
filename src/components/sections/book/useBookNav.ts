@@ -10,15 +10,19 @@ import { useMotionValue, useReducedMotion, type MotionValue } from 'framer-motio
  * not the leaves. Turning comes from tapping a side, dragging across, the
  * arrow keys, or the hidden per-photo links.
  *
- * `progress` runs 0 … leafCount and is chased toward a target with an
- * exponential ease rather than a spring — a page that overshoots and bounces
- * reads as rubber, not paper. A drag writes `progress` directly so the leaf
- * tracks the finger, then releases to the nearest whole leaf.
+ * `progress` runs 0 … leafCount and is tweened toward a target over a fixed
+ * duration. The tween itself is linear on purpose: bookGeometry's easeTurn
+ * already puts a raised cosine on each leaf's own progress, so easing here too
+ * would stack two S-curves and make the page crawl at both ends. A drag writes
+ * `progress` directly so the leaf tracks the finger, then releases to the
+ * nearest whole leaf.
  */
 
-/** Chase rate, per second. A whole turn lands in a little under a second. */
-const RATE = 9;
-/** Below this, the chase has arrived. */
+/** How long a full one-leaf turn takes. */
+const TURN_MS = 1500;
+/** Floor for short settles, so releasing a nearly-finished drag is not glacial. */
+const MIN_MS = 320;
+/** Closer than this and there is nothing to animate. */
 const EPSILON = 0.0004;
 /** Pointer travel before a press counts as a drag rather than a tap. */
 const DRAG_SLOP = 6;
@@ -48,21 +52,24 @@ export function useBookNav(leafCount: number): BookNav {
   const target = useRef(0);
   const anim = useRef(0);
 
-  const chase = useCallback(() => {
-    if (anim.current) return;
-    let last = performance.now();
+  const run = useCallback(() => {
+    if (anim.current) cancelAnimationFrame(anim.current);
+    const to = target.current;
+    const from = progress.get();
+    const span = to - from;
+    if (Math.abs(span) < EPSILON) {
+      anim.current = 0;
+      progress.set(to);
+      return;
+    }
+    // A whole leaf takes TURN_MS; a partial one takes its share. Multi-leaf
+    // jumps stay capped at TURN_MS rather than taking a second per page.
+    const duration = Math.min(TURN_MS, Math.max(MIN_MS, TURN_MS * Math.abs(span)));
+    const start = performance.now();
     const step = (now: number) => {
-      const dt = Math.min(0.05, (now - last) / 1000);
-      last = now;
-      const current = progress.get();
-      const diff = target.current - current;
-      if (Math.abs(diff) < EPSILON) {
-        anim.current = 0;
-        progress.set(target.current);
-        return;
-      }
-      progress.set(current + diff * (1 - Math.exp(-dt * RATE)));
-      anim.current = requestAnimationFrame(step);
+      const k = Math.min(1, (now - start) / duration);
+      progress.set(from + span * k);
+      anim.current = k < 1 ? requestAnimationFrame(step) : 0;
     };
     anim.current = requestAnimationFrame(step);
   }, [progress]);
@@ -78,9 +85,9 @@ export function useBookNav(leafCount: number): BookNav {
     (k: number) => {
       target.current = clamp(k, leafCount);
       if (reduced) progress.set(target.current);
-      else chase();
+      else run();
     },
-    [chase, leafCount, progress, reduced]
+    [run, leafCount, progress, reduced]
   );
 
   const next = useCallback(() => goTo(Math.round(target.current) + 1), [goTo]);
@@ -114,7 +121,11 @@ export function useBookNav(leafCount: number): BookNav {
         (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId);
       }
       // Dragging one page-width across turns one leaf. The leaf tracks the
-      // finger exactly, so the chase is parked on the same value.
+      // finger exactly, so the tween is parked on the same value.
+      if (anim.current) {
+        cancelAnimationFrame(anim.current);
+        anim.current = 0;
+      }
       const v = clamp(d.from - dx / d.page, leafCount);
       target.current = v;
       progress.set(v);

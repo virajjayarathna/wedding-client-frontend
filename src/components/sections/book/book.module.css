@@ -126,13 +126,22 @@
   top: 0;
   left: 0;
   height: 100%;
-  /* --ov is a hairline overlap that hides antialiasing gaps between strips.
-     Leaf.tsx only turns it on while the leaf is actually moving. */
-  width: calc(100% / var(--n) + var(--ov, 0px));
+  /* --ov is a hairline overlap covering the antialiasing gaps between strips.
+     Only the mid-turn strips pay it; the one-piece resting page sets it to 0. */
+  width: calc(100% / var(--n) + var(--ov, 0.7px));
   overflow: hidden;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   transform-origin: 0 50%;
+}
+
+/* Holds the strips. Hidden until the leaf moves — see Leaf.tsx. Carries no
+   transform of its own, so the strips' coordinates are unchanged. */
+.plane {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  visibility: hidden;
 }
 
 /* The full page, offset inside the strip so each strip shows its own slice. */
@@ -140,12 +149,12 @@
   position: absolute;
   top: 0;
   height: 100%;
-  width: calc((100% - var(--ov, 0px)) * var(--n));
+  width: calc((100% - var(--ov, 0.7px)) * var(--n));
   display: flex;
 }
 
 .faceFront {
-  left: calc(-1 * var(--i) * (100% - var(--ov, 0px)));
+  left: calc(-1 * var(--i) * (100% - var(--ov, 0.7px)));
 }
 
 /*
@@ -154,7 +163,7 @@
  * inward from the fore-edge instead of outward from the gutter.
  */
 .faceBack {
-  left: calc((var(--i) + 1 - var(--n)) * (100% - var(--ov, 0px)));
+  left: calc((var(--i) + 1 - var(--n)) * (100% - var(--ov, 0.7px)));
 }
 
 /* Lambert darkening and the specular band riding the crest of the bow. */
