@@ -1,18 +1,19 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
-import { motion, useMotionValueEvent, useReducedMotion } from 'framer-motion';
-import Leaf from './Leaf';
-import { SEGMENTS_DESKTOP, SEGMENTS_MOBILE } from './bookGeometry';
-import { buildFaces, isHard, toLeaves, type BookCopy } from './pages';
-import { useBookNav } from './useBookNav';
+import { useMemo } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { buildFaces, buildSpreads, FaceContent, type BookCopy } from './pages';
+import { useSpreadNav } from './useSpreadNav';
 import styles from './book.module.css';
 
 /**
  * The gallery book.
  *
  * An ordinary in-flow section: the page scrolls past it untouched, and pages
- * are turned by hand — tap a side, drag across, arrow keys. See useBookNav.
+ * are turned by hand — tap a side, swipe, arrow keys. See useSpreadNav.
+ *
+ * Turning is a plain crossfade-and-slide between spreads, not an animated
+ * page flip. Nothing here is 3D.
  */
 
 interface BookProps {
@@ -20,94 +21,28 @@ interface BookProps {
   copy: BookCopy;
 }
 
-const DUST_MOTES = 9;
-
-/**
- * Media queries read through useSyncExternalStore rather than an effect, so the
- * strip count is derived during render instead of arriving one paint late.
- * The server snapshot is `false`, which keeps hydration on the cheap variant.
- */
-function useMediaQuery(query: string): boolean {
-  const subscribe = useCallback(
-    (notify: () => void) => {
-      const mq = window.matchMedia(query);
-      mq.addEventListener('change', notify);
-      return () => mq.removeEventListener('change', notify);
-    },
-    [query]
-  );
-  return useSyncExternalStore(
-    subscribe,
-    () => window.matchMedia(query).matches,
-    () => false
-  );
-}
-
 export default function Book({ images, copy }: BookProps) {
   const reduced = useReducedMotion();
-  const stageRef = useRef<HTMLDivElement>(null);
-  const bookRef = useRef<HTMLDivElement>(null);
 
-  const leaves = useMemo(() => toLeaves(buildFaces(images)), [images]);
-  const leafCount = leaves.length;
+  const faces = useMemo(() => buildFaces(images), [images]);
+  const spreads = useMemo(() => buildSpreads(faces), [faces]);
 
-  const { progress, goTo, next, prev, draggedRef, handlers } = useBookNav(leafCount);
+  const { index, direction, goTo, next, prev, draggedRef, handlers } = useSpreadNav(spreads.length);
 
-  // Strip count is a straight quality/cost trade: it is the multiplier on how
-  // many copies of every page live in the DOM.
-  const wide = useMediaQuery('(min-width: 768px)');
-  const segments = reduced ? 1 : wide ? SEGMENTS_DESKTOP : SEGMENTS_MOBILE;
-
-  const widthRef = useRef(0);
-  const [resizeTick, setResizeTick] = useState(0);
-  const [spread, setSpread] = useState(0);
-
-  // One page is half the stage. Everything in bookGeometry works in these px.
-  // ResizeObserver fires once on observe(), which covers the initial measure.
-  useEffect(() => {
-    const el = stageRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver(() => {
-      widthRef.current = el.clientWidth / 2;
-      setResizeTick((n) => n + 1);
+  // Which spread each photograph lives on, for the hidden per-photo links.
+  const photoToSpread = useMemo(() => {
+    const map: number[] = [];
+    spreads.forEach((s, si) => {
+      const onSpread = s.kind === 'single' ? [s.face] : [s.left, s.right];
+      for (const f of onSpread) {
+        if (f.kind === 'plate') map[f.index] = si;
+      }
     });
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
+    return map;
+  }, [spreads]);
 
-  // Book-wide reactions to progress: where the book sits on the stage, how much
-  // dust and candlelight the turn stirs up, and the announcement for
-  // assistive tech.
-  useMotionValueEvent(progress, 'change', (p) => {
-    const stage = stageRef.current;
-    const book = bookRef.current;
-    if (book) {
-      // A closed book is one page wide, so sitting it in the middle of a
-      // two-page stage would park it in the right half. Slide the whole book
-      // over while only one half is in use, and let it open out to centre as
-      // the cover turns — the same move the object makes on a table.
-      const openOut = Math.min(1, p);
-      const closeIn = Math.max(0, p - (leafCount - 1));
-      book.style.transform = `translateX(${-25 * (1 - openOut) + 25 * closeIn}%)`;
-    }
-    if (stage) {
-      const frac = p - Math.floor(p);
-      stage.style.setProperty('--activity', String(Math.sin(Math.PI * frac)));
-    }
-    const rounded = Math.round(p);
-    if (rounded !== spread) setSpread(rounded);
-  });
-
-  const motes = useMemo(
-    () =>
-      Array.from({ length: DUST_MOTES }, (_, i) => ({
-        left: `${8 + ((i * 37) % 84)}%`,
-        top: `${20 + ((i * 53) % 60)}%`,
-        delay: `${(i * 0.47) % 4.5}s`,
-        dx: `${((i % 5) - 2) * 9}px`,
-      })),
-    []
-  );
+  const spread = spreads[index];
+  const slide = reduced ? 0 : 36;
 
   return (
     <div className={styles.wrap}>
@@ -126,7 +61,6 @@ export default function Book({ images, copy }: BookProps) {
       </motion.div>
 
       <div
-        ref={stageRef}
         className={styles.stage}
         tabIndex={0}
         role="group"
@@ -140,60 +74,44 @@ export default function Book({ images, copy }: BookProps) {
         {...handlers}
       >
         <div className={styles.glow} />
+        <div className={styles.seam} />
 
-        <div ref={bookRef} className={styles.book}>
-          {leaves.map((leaf, i) => (
-            <Leaf
-              key={i}
-              index={i}
-              leafCount={leafCount}
-              front={leaf.front}
-              back={leaf.back}
-              copy={copy}
-              progress={progress}
-              segments={segments}
-              widthRef={widthRef}
-              resizeTick={resizeTick}
-              hard={isHard(leaf.front) || isHard(leaf.back)}
-              reduced={!!reduced}
-            />
-          ))}
-        </div>
-
-        {!reduced && (
-          <div className={styles.dust} aria-hidden>
-            {motes.map((m, i) => (
-              <span
-                key={i}
-                className={styles.mote}
-                style={
-                  {
-                    left: m.left,
-                    top: m.top,
-                    animationDelay: m.delay,
-                    ['--dx' as string]: m.dx,
-                  } as React.CSSProperties
-                }
-              />
-            ))}
-          </div>
-        )}
-
+        <AnimatePresence initial={false} mode="popLayout">
+          <motion.div
+            key={index}
+            className={styles.spread}
+            initial={{ opacity: 0, x: direction * slide }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: direction * -slide }}
+            transition={{ duration: reduced ? 0 : 0.42, ease: [0.4, 0, 0.2, 1] }}
+          >
+            {spread.kind === 'single' ? (
+              <div className={styles.pageSingle}>
+                <FaceContent face={spread.face} recto copy={copy} seed={index} />
+              </div>
+            ) : (
+              <>
+                <div className={styles.pageLeft}>
+                  <FaceContent face={spread.left} recto={false} copy={copy} seed={index * 2} />
+                </div>
+                <div className={styles.pageRight}>
+                  <FaceContent face={spread.right} recto copy={copy} seed={index * 2 + 1} />
+                </div>
+              </>
+            )}
+          </motion.div>
+        </AnimatePresence>
       </div>
 
-      <p className={styles.hint}>
-        Tap a side to turn the page — or drag across, or use ← →
-      </p>
+      <p className={styles.hint}>Tap a side to turn the page — or swipe, or use ← →</p>
 
-      {/* The book itself is aria-hidden: every page is duplicated once per
-          strip, which would read as gibberish. This is the real content. */}
       <div className={styles.srOnly} aria-live="polite">
-        Spread {Math.min(spread + 1, leafCount)} of {leafCount}
+        Spread {index + 1} of {spreads.length}
       </div>
       <ul className={styles.srOnly}>
         {images.map((src, i) => (
           <li key={src}>
-            <button type="button" onClick={() => goTo(Math.floor(i / 2) + 1)}>
+            <button type="button" onClick={() => goTo(photoToSpread[i] ?? 0)}>
               Photograph {i + 1}
             </button>
           </li>

@@ -1,6 +1,5 @@
 'use client';
 
-import { plateTilt } from './bookGeometry';
 import styles from './book.module.css';
 
 /**
@@ -62,18 +61,32 @@ export function buildFaces(images: string[]): Face[] {
   return faces;
 }
 
-/** Faces pair up two at a time; a leaf is a recto plus the verso behind it. */
-export function toLeaves(faces: Face[]): { front: Face; back: Face }[] {
-  const leaves: { front: Face; back: Face }[] = [];
-  for (let i = 0; i < faces.length; i += 2) {
-    leaves.push({ front: faces[i], back: faces[i + 1] ?? { kind: 'endpaper' } });
+export type Spread =
+  | { kind: 'single'; face: Face }
+  | { kind: 'pair'; left: Face; right: Face };
+
+/**
+ * Faces to spreads: the front and back covers stand alone (a closed book
+ * shows one side at a time); everything between pairs up left-right in
+ * reading order. `buildFaces` guarantees an even face count, so the middle
+ * always divides evenly.
+ */
+export function buildSpreads(faces: Face[]): Spread[] {
+  const spreads: Spread[] = [{ kind: 'single', face: faces[0] }];
+  for (let i = 1; i < faces.length - 1; i += 2) {
+    spreads.push({ kind: 'pair', left: faces[i], right: faces[i + 1] });
   }
-  return leaves;
+  spreads.push({ kind: 'single', face: faces[faces.length - 1] });
+  return spreads;
 }
 
-/** Covers are rigid: they must not bow while they swing. */
-export function isHard(face: Face): boolean {
-  return face.kind === 'cover' || face.kind === 'backcover';
+/**
+ * Deterministic per-index jitter for mounted prints, so photos sit slightly
+ * askew like real tipped-in plates. Must not be random: the server and the
+ * client have to agree or React screams about the mismatch.
+ */
+function plateTilt(index: number): number {
+  return (((index * 37) % 9) - 4) * 0.34;
 }
 
 // ── Ornaments ──────────────────────────────────────────────────────────────
