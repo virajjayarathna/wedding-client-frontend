@@ -28,9 +28,18 @@ export interface GuestDetails {
   secondRsvpContact?: RsvpContact | null;
 }
 
+/**
+ * Which card template this invitation renders. WEDDING is the original
+ * bride-first card; HOME_COMING is the groom's-side card, which flips the
+ * couple order and the "daughter & son" wording. Optional at runtime —
+ * responses from an older backend simply fall back to WEDDING.
+ */
+export type CeremonyType = 'WEDDING' | 'HOME_COMING';
+
 export interface WeddingInfo {
   brideName: string;
   groomName: string;
+  ceremonyType?: CeremonyType | null;
   weddingDate: string;
   weddingSlug: string;
   loveStory?: string | null;

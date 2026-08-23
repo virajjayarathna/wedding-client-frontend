@@ -19,6 +19,14 @@ export default function InvitationCard({ wedding, guestName }: InvitationCardPro
   // invitation reads as a different design from the sections around it.
   const formalFont = 'var(--font-serif)';
 
+  // Home-coming cards are sent from the groom's side, so the couple reads
+  // groom-first and the celebrate line swaps "daughter & son" accordingly.
+  // Anything other than HOME_COMING (including a missing value) keeps the
+  // original wedding wording.
+  const isHomeComing = wedding?.ceremonyType === 'HOME_COMING';
+  const firstName = isHomeComing ? wedding?.groomName : wedding?.brideName;
+  const secondName = isHomeComing ? wedding?.brideName : wedding?.groomName;
+
   return (
     <section className="py-24 px-4 md:px-6 relative z-10 w-full flex justify-center section-bg-card">
       <motion.div 
@@ -79,7 +87,9 @@ export default function InvitationCard({ wedding, guestName }: InvitationCardPro
         </div>
 
         <div className="font-serif text-[10px] md:text-[12px] text-charcoal uppercase tracking-[1px] my-4 md:my-6 leading-[1.8] relative z-10" style={{ fontFamily: formalFont }}>
-          TO CELEBRATE THE WEDDING OF THEIR DAUGHTER &amp; SON
+          {isHomeComing
+            ? 'TO CELEBRATE THE WEDDING OF THEIR SON & DAUGHTER'
+            : 'TO CELEBRATE THE WEDDING OF THEIR DAUGHTER & SON'}
         </div>
 
         <h2 
@@ -91,7 +101,7 @@ export default function InvitationCard({ wedding, guestName }: InvitationCardPro
             padding: '0 10px'
           }}
         >
-          {wedding?.brideName} <span className="font-serif text-3xl md:text-4xl italic px-2 text-gold" style={{ fontFamily: formalFont }}>&amp;</span> {wedding?.groomName}
+          {firstName} <span className="font-serif text-3xl md:text-4xl italic px-2 text-gold" style={{ fontFamily: formalFont }}>&amp;</span> {secondName}
         </h2>
         
       </motion.div>
