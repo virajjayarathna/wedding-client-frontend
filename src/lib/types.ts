@@ -1,5 +1,5 @@
 export type RsvpStatus = 'PENDING' | 'ATTENDING' | 'DECLINING' | 'MAYBE';
-export type GuestTitle = 'MR' | 'MRS' | 'MR_AND_MRS' | 'MS' | 'DR' | 'FAMILY' | 'MASTER' | 'BRIG' | 'BRIG_AND_MRS';
+export type GuestTitle = 'MR' | 'MRS' | 'MR_AND_MRS' | 'MS' | 'DR' | 'FAMILY' | 'MASTER' | 'BRIG' | 'BRIG_AND_MRS' | 'MAJ';
 export type MusicType = 'SPOTIFY' | 'UPLOAD';
 
 export interface TimelineEvent {
@@ -17,6 +17,7 @@ export interface RsvpContact {
 export interface GuestDetails {
   id: string;
   title: GuestTitle;
+  isFamily?: boolean;
   firstName: string;
   lastName: string;
   maxAttendants: number;

@@ -21,7 +21,7 @@ import Footer from '@/components/sections/Footer';
 import FloatingNav from '@/components/sections/FloatingNav';
 import RsvpModal from '@/components/sections/RsvpModal';
 
-const TITLE_MAP: Record<string, string> = { MR: 'Mr.', MRS: 'Mrs.', MR_AND_MRS: 'Mr. & Mrs.', MS: 'Ms.', DR: 'Dr.', FAMILY: 'The', MASTER: 'Master', BRIG: 'Brig.', BRIG_AND_MRS: 'Brig. and Mrs.' };
+const TITLE_MAP: Record<string, string> = { MR: 'Mr.', MRS: 'Mrs.', MR_AND_MRS: 'Mr. & Mrs.', MS: 'Ms.', DR: 'Dr.', FAMILY: 'The', MASTER: 'Master', BRIG: 'Brig.', BRIG_AND_MRS: 'Brig. and Mrs.', MAJ: 'Maj.' };
 
 export default function InviteClient() {
   const params = useParams();
@@ -106,8 +106,11 @@ export default function InviteClient() {
   }
 
   const { wedding, guest } = data;
-  const isFamily = guest.title === 'FAMILY';
-  const guestName = isFamily ? `${TITLE_MAP[guest.title]} ${guest.lastName} Family` : `${TITLE_MAP[guest.title]} ${guest.firstName} ${guest.lastName}`;
+  const isLegacyFamilyTitle = guest.title === 'FAMILY';
+  const baseGuestName = isLegacyFamilyTitle
+    ? `${TITLE_MAP[guest.title]} ${guest.lastName} Family`
+    : `${TITLE_MAP[guest.title]} ${guest.firstName} ${guest.lastName}`;
+  const guestName = guest.isFamily ? `${baseGuestName} and Family` : baseGuestName;
 
   // Build contacts array for ContactSection from the guest's assigned RSVP
   // contacts (configured by the admin under Wedding Editor → Venue & RSVP,
