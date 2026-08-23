@@ -127,8 +127,11 @@
   left: 0;
   height: 100%;
   /* --ov is a hairline overlap covering the antialiasing gaps between strips.
-     Only the mid-turn strips pay it; the one-piece resting page sets it to 0. */
-  width: calc(100% / var(--n) + var(--ov, 0.7px));
+     Only the mid-turn strips pay it; the one-piece resting page sets it to 0.
+     0.7px was too thin where the bow's curvature is steepest (near the
+     fore-edge) — adjacent strips' rotated edges land far enough apart in
+     rendered pixels to show as a seam, worse at higher device pixel ratios. */
+  width: calc(100% / var(--n) + var(--ov, 1.75px));
   overflow: hidden;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
@@ -149,12 +152,12 @@
   position: absolute;
   top: 0;
   height: 100%;
-  width: calc((100% - var(--ov, 0.7px)) * var(--n));
+  width: calc((100% - var(--ov, 1.75px)) * var(--n));
   display: flex;
 }
 
 .faceFront {
-  left: calc(-1 * var(--i) * (100% - var(--ov, 0.7px)));
+  left: calc(-1 * var(--i) * (100% - var(--ov, 1.75px)));
 }
 
 /*
@@ -163,7 +166,7 @@
  * inward from the fore-edge instead of outward from the gutter.
  */
 .faceBack {
-  left: calc((var(--i) + 1 - var(--n)) * (100% - var(--ov, 0.7px)));
+  left: calc((var(--i) + 1 - var(--n)) * (100% - var(--ov, 1.75px)));
 }
 
 /* Lambert darkening and the specular band riding the crest of the bow. */
