@@ -90,8 +90,11 @@
   transform-style: preserve-3d;
   /* Overwritten from JS as the reader progresses; these are the closed-book
      values so the very first paint already has the block on the right. */
-  --stack-l: 1px;
+  --stack-l: 0px;
   --stack-r: 29px;
+  /* Closed book, sitting in the right half — see the transform written from
+     Book.tsx as the reader opens it. */
+  transform: translateX(-25%);
 }
 
 /* The sewn seam, visible in the hairline gap between the two halves. */
@@ -592,42 +595,6 @@
 .bandsRight { right: 0; transform: scaleX(-1); }
 
 /* ── Chrome ────────────────────────────────────────────────────────────── */
-
-.nav {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 60;
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  color: var(--book-gilt-hi);
-  background: rgba(28, 16, 8, 0.72);
-  border: 1px solid var(--book-gilt);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-  transition: transform 0.2s ease, background 0.2s ease, opacity 0.2s ease;
-}
-
-.nav:hover:not(:disabled) {
-  background: rgba(48, 28, 12, 0.9);
-  transform: translateY(-50%) scale(1.09);
-}
-
-.nav:disabled {
-  opacity: 0.22;
-  cursor: default;
-}
-
-.navPrev { left: -14px; }
-.navNext { right: -14px; }
-
-@media (min-width: 768px) {
-  .navPrev { left: -30px; }
-  .navNext { right: -30px; }
-}
 
 .hint {
   font-family: var(--font-serif);

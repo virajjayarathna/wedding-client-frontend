@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { motion, useMotionValueEvent, useReducedMotion } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Leaf from './Leaf';
 import { SEGMENTS_DESKTOP, SEGMENTS_MOBILE } from './bookGeometry';
 import { buildFaces, isHard, toLeaves, type BookCopy } from './pages';
@@ -94,8 +93,15 @@ export default function Book({ images, copy }: BookProps) {
     const book = bookRef.current;
     if (book) {
       const read = leafCount > 0 ? p / leafCount : 0;
-      book.style.setProperty('--stack-l', `${1 + 28 * read}px`);
-      book.style.setProperty('--stack-r', `${1 + 28 * (1 - read)}px`);
+      book.style.setProperty('--stack-l', `${28 * read}px`);
+      book.style.setProperty('--stack-r', `${28 * (1 - read)}px`);
+      // A closed book is one page wide, so sitting it in the middle of a
+      // two-page stage would park it in the right half. Slide the whole book
+      // over while only one half is in use, and let it open out to centre as
+      // the cover turns — the same move the object makes on a table.
+      const openOut = Math.min(1, p);
+      const closeIn = Math.max(0, p - (leafCount - 1));
+      book.style.transform = `translateX(${-25 * (1 - openOut) + 25 * closeIn}%)`;
     }
     if (stage) {
       const frac = p - Math.floor(p);
@@ -196,34 +202,10 @@ export default function Book({ images, copy }: BookProps) {
             </div>
           )}
 
-          <button
-            type="button"
-            className={`${styles.nav} ${styles.navPrev}`}
-            aria-label="Previous page"
-            disabled={spread <= 0}
-            onClick={(e) => {
-              e.stopPropagation();
-              prev();
-            }}
-          >
-            <ChevronLeft size={20} />
-          </button>
-          <button
-            type="button"
-            className={`${styles.nav} ${styles.navNext}`}
-            aria-label="Next page"
-            disabled={spread >= leafCount}
-            onClick={(e) => {
-              e.stopPropagation();
-              next();
-            }}
-          >
-            <ChevronRight size={20} />
-          </button>
         </div>
 
         <p className={styles.hint}>
-          Scroll to turn the pages — or drag a corner, tap a side, use ← →
+          Scroll to turn the pages — or drag, tap a side, use ← →
         </p>
 
         {/* The book itself is aria-hidden: every page is duplicated once per
