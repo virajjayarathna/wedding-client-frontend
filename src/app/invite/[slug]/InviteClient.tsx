@@ -169,7 +169,7 @@ export default function InviteClient() {
 
           <ContactSection contacts={contacts} />
           
-          <Footer brideName={wedding.brideName} groomName={wedding.groomName} />
+          <Footer brideName={wedding.brideName} groomName={wedding.groomName} ceremonyType={wedding.ceremonyType} />
 
           {/* Floating Navigation */}
           <FloatingNav 

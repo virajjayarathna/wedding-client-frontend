@@ -15,6 +15,12 @@ export default function HeroSection({ wedding }: HeroSectionProps) {
     ? format(new Date(wedding.weddingDate), 'EEEE, MMMM do, yyyy') 
     : '';
 
+  // Home-coming cards are sent from the groom's side, so the couple reads
+  // groom-first there instead of the default bride-first order.
+  const isHomeComing = wedding.ceremonyType === 'HOME_COMING';
+  const firstName = isHomeComing ? wedding.groomName : wedding.brideName;
+  const secondName = isHomeComing ? wedding.brideName : wedding.groomName;
+
 
   return (
     <section className="relative min-h-screen w-full flex items-center justify-center overflow-hidden">
@@ -44,11 +50,11 @@ export default function HeroSection({ wedding }: HeroSectionProps) {
           transition={{ duration: 1.2, delay: 0.5 }}
         >
           <h1 className="font-serif text-6xl md:text-8xl lg:text-9xl text-white mb-6 drop-shadow-lg tracking-wide">
-            {wedding.brideName} 
+            {firstName} 
             <br className="md:hidden" />
             <span className="text-gold mx-4 text-5xl md:text-7xl">&amp;</span>
             <br className="md:hidden" /> 
-            {wedding.groomName}
+            {secondName}
           </h1>
           <div className="w-16 h-[1px] bg-gold/70 mx-auto mb-6" />
           <p className="text-white/90 text-sm md:text-base font-sans tracking-[4px] uppercase drop-shadow-md mb-8">
