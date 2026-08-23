@@ -112,7 +112,12 @@ export default function Leaf({
         root.style.zIndex = String(isFlipped ? index : leafCount - index);
       }
 
-      const isMoving = tt > 0.001 && tt < 0.999;
+      // Hard leaves (covers) never bow, so every strip in the mesh would
+      // carry the same angle — same math as the flat one-piece page, just
+      // split across strip edges that round to different device pixels and
+      // draw as vertical seams while turning. Keep hard leaves on the
+      // seam-free flat page for the whole turn, not only at rest.
+      const isMoving = !hard && tt > 0.001 && tt < 0.999;
       if (isMoving !== moving.current) {
         moving.current = isMoving;
         root.style.willChange = isMoving ? 'transform' : 'auto';
