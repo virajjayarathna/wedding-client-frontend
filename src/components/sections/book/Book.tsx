@@ -83,7 +83,7 @@ export default function Book({ images, copy }: BookProps) {
             initial={{ opacity: 0, x: direction * slide }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: direction * -slide }}
-            transition={{ duration: reduced ? 0 : 0.42, ease: [0.4, 0, 0.2, 1] }}
+            transition={{ duration: reduced ? 0 : 1.5, ease: [0.4, 0, 0.2, 1] }}
           >
             {spread.kind === 'single' ? (
               <div className={styles.pageSingle}>
