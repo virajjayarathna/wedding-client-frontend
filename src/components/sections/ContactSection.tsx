@@ -69,7 +69,7 @@ export default function ContactSection({ contacts }: ContactSectionProps) {
                 href={`https://wa.me/${formatWhatsApp(contact.phone)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 flex justify-center items-center gap-2 py-3 rounded-full bg-[#25D366] text-white shadow-md hover:shadow-lg hover:scale-105 transition-all"
+                className="flex-1 flex justify-center items-center gap-2 py-3 rounded-full border border-gold text-charcoal hover:bg-gold/10 transition-colors shadow-sm"
               >
                 <MessageCircle size={16} /> WhatsApp
               </a>

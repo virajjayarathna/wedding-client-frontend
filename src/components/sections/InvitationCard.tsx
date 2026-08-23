@@ -29,7 +29,7 @@ export default function InvitationCard({ wedding, guestName }: InvitationCardPro
 
   return (
     <section className="py-24 px-4 md:px-6 relative z-10 w-full flex justify-center section-bg-card">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
@@ -40,24 +40,24 @@ export default function InvitationCard({ wedding, guestName }: InvitationCardPro
           boxShadow: '0 20px 40px rgba(0,0,0,0.05)',
         }}
       >
-        <div 
-          className="absolute inset-0 pointer-events-none m-4 md:m-5" 
+        <div
+          className="absolute inset-0 pointer-events-none m-4 md:m-5"
           style={{ border: `2px solid ${primaryColor}`, opacity: 1 }}
         />
-        <div 
-          className="absolute inset-0 pointer-events-none m-[22px] md:m-[27px]" 
+        <div
+          className="absolute inset-0 pointer-events-none m-[22px] md:m-[27px]"
           style={{ border: `1px solid ${accentColor}`, opacity: 1 }}
         />
-        
+
         {wedding?.pdfLogoUrl ? (
           <div className="mb-6 md:mb-8 h-32 md:h-48 flex items-center justify-center relative z-10 mt-6">
             <img src={wedding.pdfLogoUrl} alt="Logo" className="max-h-full max-w-full object-contain" />
           </div>
         ) : (
           <div className="mb-6 md:mb-8 flex items-center justify-center relative z-10 mt-8">
-            <div 
+            <div
               className="text-7xl md:text-8xl flex"
-              style={{ 
+              style={{
                 color: primaryColor,
                 fontFamily: wedding?.pdfFont ? `'${wedding.pdfFont}', cursive` : 'var(--font-script)',
                 lineHeight: 1
@@ -70,8 +70,8 @@ export default function InvitationCard({ wedding, guestName }: InvitationCardPro
         )}
 
         <div className="font-serif text-[11px] md:text-[13px] tracking-[2px] uppercase text-charcoal mb-3 md:mb-4 leading-[1.3] relative z-10" style={{ fontFamily: formalFont }}>
-          MR. &amp; MRS. {wedding?.brideFatherName?.toUpperCase() || ''}<br/>
-          <span className="inline-block my-0.5 text-[11px] md:text-[13px] tracking-[2px]">TOGETHER WITH</span><br/>
+          MR. &amp; MRS. {wedding?.brideFatherName?.toUpperCase() || ''}<br />
+          <span className="inline-block my-0.5 text-[11px] md:text-[13px] tracking-[2px]">TOGETHER WITH</span><br />
           MR. &amp; MRS. {wedding?.groomFatherName?.toUpperCase() || ''}
         </div>
 
@@ -79,7 +79,7 @@ export default function InvitationCard({ wedding, guestName }: InvitationCardPro
           REQUEST THE HONOUR OF THE PRESENCE OF
         </div>
 
-        <div 
+        <div
           className="font-serif text-lg md:text-xl text-charcoal my-4 md:my-6 py-4 px-8 w-full max-w-[80%] relative z-10"
           style={{ borderTop: `1px solid ${accentColor}`, borderBottom: `1px solid ${accentColor}`, fontFamily: formalFont }}
         >
@@ -88,13 +88,13 @@ export default function InvitationCard({ wedding, guestName }: InvitationCardPro
 
         <div className="font-serif text-[10px] md:text-[12px] text-charcoal uppercase tracking-[1px] my-4 md:my-6 leading-[1.8] relative z-10" style={{ fontFamily: formalFont }}>
           {isHomeComing
-            ? 'TO CELEBRATE THE WEDDING OF THEIR SON & DAUGHTER'
+            ? 'TO CELEBRATE THE HOMECOMING OF THEIR SON & DAUGHTER'
             : 'TO CELEBRATE THE WEDDING OF THEIR DAUGHTER & SON'}
         </div>
 
-        <h2 
+        <h2
           className="text-5xl md:text-6xl mb-6 relative z-10 pt-4"
-          style={{ 
+          style={{
             color: primaryColor,
             fontFamily: wedding?.pdfFont ? `'${wedding.pdfFont}', cursive` : 'var(--font-script)',
             lineHeight: 1.2,
@@ -103,7 +103,7 @@ export default function InvitationCard({ wedding, guestName }: InvitationCardPro
         >
           {firstName} <span className="font-serif text-3xl md:text-4xl italic px-2 text-gold" style={{ fontFamily: formalFont }}>&amp;</span> {secondName}
         </h2>
-        
+
       </motion.div>
     </section>
   );

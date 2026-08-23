@@ -73,7 +73,7 @@ export default function VenueSection({ wedding }: VenueSectionProps) {
                       href={getGoogleCalendarUrl()}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-sm uppercase tracking-wider font-semibold text-black hover:text-charcoal transition-colors border-b border-black/50 pb-1"
+                      className="inline-flex items-center gap-2 text-sm uppercase tracking-wider font-semibold text-charcoal hover:text-gold transition-colors border-b border-charcoal/30 pb-1"
                     >
                       <Calendar size={16} /> Add to Calendar
                     </a>
@@ -95,7 +95,7 @@ export default function VenueSection({ wedding }: VenueSectionProps) {
                       href={wedding.venueMapsUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-block text-sm uppercase tracking-wider font-semibold text-black hover:text-charcoal transition-colors border-b border-black/50 pb-1"
+                      className="inline-block text-sm uppercase tracking-wider font-semibold text-charcoal hover:text-gold transition-colors border-b border-charcoal/30 pb-1"
                     >
                       View on Google Maps
                     </a>
