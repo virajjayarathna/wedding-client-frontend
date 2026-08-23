@@ -17,8 +17,9 @@ interface LoveStoryGalleryProps {
  * this only turns wedding data into the handful of strings the covers and
  * title pages need.
  *
- * Note the absence of `overflow-hidden` here: the book pins itself with
- * `position: sticky`, which silently stops working under a clipped ancestor.
+ * The horizontal clip matters: a closed book is slid a quarter-stage sideways
+ * so its single visible page lands in the middle, which puts the empty half
+ * outside the viewport and would otherwise give a phone a sideways scroll.
  */
 export default function LoveStoryGallery({
   images,
@@ -41,7 +42,10 @@ export default function LoveStoryGallery({
   if (!images || images.length === 0) return null;
 
   return (
-    <section id="gallery" className="relative z-10 section-bg-gallery">
+    <section
+      id="gallery"
+      className="relative z-10 section-bg-gallery overflow-x-hidden py-20 md:py-24 px-4 md:px-6"
+    >
       <Book images={images} copy={copy} />
     </section>
   );

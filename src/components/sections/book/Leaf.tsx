@@ -102,6 +102,10 @@ export default function Leaf({
       if (isMoving !== moving.current) {
         moving.current = isMoving;
         root.style.willChange = isMoving ? 'transform' : 'auto';
+        // Overlapping strips double-composite the page's translucent gradient
+        // layers, so a resting leaf gets exact tiling and only a moving one
+        // pays a hairline of overlap to cover antialiasing gaps.
+        root.style.setProperty('--ov', isMoving ? '0.7px' : '0px');
       }
 
       const zBase = (isFlipped ? -(leafCount - index) : -index) * 0.12;
