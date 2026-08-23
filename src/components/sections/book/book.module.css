@@ -128,10 +128,13 @@
   height: 100%;
   /* --ov is a hairline overlap covering the antialiasing gaps between strips.
      Only the mid-turn strips pay it; the one-piece resting page sets it to 0.
-     0.7px was too thin where the bow's curvature is steepest (near the
-     fore-edge) — adjacent strips' rotated edges land far enough apart in
-     rendered pixels to show as a seam, worse at higher device pixel ratios. */
-  width: calc(100% / var(--n) + var(--ov, 1.75px));
+     This is authored in the strip's own unrotated space, so most of it is
+     lost to foreshortening once a strip nears edge-on (rotateY ~90deg, i.e.
+     the leaf's midturn) — measured on a live spread, 1.75px of local overlap
+     left under 0.5px on screen at the hinge-side strip, thin enough to show
+     as a seam. 6px keeps a projected screen overlap safely above 1px through
+     the whole turn, worst case included. */
+  width: calc(100% / var(--n) + var(--ov, 6px));
   overflow: hidden;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
@@ -152,12 +155,12 @@
   position: absolute;
   top: 0;
   height: 100%;
-  width: calc((100% - var(--ov, 1.75px)) * var(--n));
+  width: calc((100% - var(--ov, 6px)) * var(--n));
   display: flex;
 }
 
 .faceFront {
-  left: calc(-1 * var(--i) * (100% - var(--ov, 1.75px)));
+  left: calc(-1 * var(--i) * (100% - var(--ov, 6px)));
 }
 
 /*
@@ -166,7 +169,7 @@
  * inward from the fore-edge instead of outward from the gutter.
  */
 .faceBack {
-  left: calc((var(--i) + 1 - var(--n)) * (100% - var(--ov, 1.75px)));
+  left: calc((var(--i) + 1 - var(--n)) * (100% - var(--ov, 6px)));
 }
 
 /* Lambert darkening and the specular band riding the crest of the bow. */
