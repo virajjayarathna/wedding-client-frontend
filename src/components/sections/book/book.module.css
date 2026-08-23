@@ -1,0 +1,685 @@
+/*
+ * THE CHRONICLE — an aged, gilt-edged tome.
+ *
+ * Layout in one paragraph: a tall `.section` scrolls past a `position: sticky`
+ * `.sticky` stage, which pins the book. `.stage` owns the perspective, `.book`
+ * is the 3D rendering context. Each leaf is half the book wide, hinged on its
+ * left edge at the gutter, and is drawn as N vertical strips so the paper can
+ * bow while it turns. Strips are siblings — not nested — because `overflow:
+ * hidden` (which is what clips a strip to its slice) forces `transform-style`
+ * back to flat and would collapse any 3D chain built through it. Each strip
+ * therefore carries its own fully composed matrix, written from JS.
+ *
+ * Colour comes from theme tokens only; see the --book-* block in globals.css.
+ */
+
+/* ── Shell ─────────────────────────────────────────────────────────────── */
+
+.section {
+  position: relative;
+  z-index: 10;
+  /* Height is set inline from the leaf count: it is the scroll budget the
+     sticky stage consumes while the book is being read. */
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.75rem, 2.4vh, 1.75rem);
+  padding: 3vh 0;
+}
+
+.heading {
+  text-align: center;
+  pointer-events: none;
+}
+
+.stage {
+  position: relative;
+  width: min(94vw, 1040px);
+  aspect-ratio: 2 / 1.3;
+  max-height: 74vh;
+  perspective: 2600px;
+  perspective-origin: 50% 42%;
+  /* Vertical panning stays with the browser; horizontal drags reach us. */
+  touch-action: pan-y;
+  outline: none;
+  cursor: grab;
+}
+
+.stage:active {
+  cursor: grabbing;
+}
+
+.stage:focus-visible {
+  outline: 1px solid var(--book-gilt);
+  outline-offset: 18px;
+}
+
+@media (max-width: 767px) {
+  .stage {
+    width: 96vw;
+    aspect-ratio: 2 / 1.45;
+  }
+}
+
+/* Candle light pooling behind the book. Opacity tracks turning activity. */
+.glow {
+  position: absolute;
+  inset: -18% -12%;
+  pointer-events: none;
+  background: radial-gradient(
+    58% 52% at 50% 44%,
+    rgba(255, 216, 150, 0.22),
+    rgba(255, 190, 120, 0.07) 45%,
+    transparent 72%
+  );
+  opacity: calc(0.45 + var(--activity, 0) * 0.55);
+}
+
+/* ── Book body ─────────────────────────────────────────────────────────── */
+
+.book {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  /* Overwritten from JS as the reader progresses; these are the closed-book
+     values so the very first paint already has the block on the right. */
+  --stack-l: 1px;
+  --stack-r: 29px;
+}
+
+/* The sewn seam, visible in the hairline gap between the two halves. */
+.book::before {
+  content: '';
+  position: absolute;
+  top: 1%;
+  bottom: 1%;
+  left: 50%;
+  width: 14px;
+  transform: translateX(-50%);
+  border-radius: 3px;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 16px,
+      rgba(255, 226, 175, 0.5) 16px 22px,
+      transparent 22px 38px
+    ),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.5));
+}
+
+/*
+ * The page block. Two gilt-edged slabs peeking out past each fore-edge, their
+ * widths driven from JS as --stack-l / --stack-r. The left one thickens and the
+ * right one thins as the reader works through the book, which is most of what
+ * makes the thing feel like an object rather than two rectangles.
+ */
+.edge {
+  position: absolute;
+  top: 1.5%;
+  bottom: 1.5%;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.5) 0 1px,
+      rgba(96, 66, 24, 0.32) 1px 2.4px
+    ),
+    linear-gradient(
+      to bottom,
+      var(--book-gilt-hi),
+      var(--book-gilt) 42%,
+      var(--book-gilt-lo)
+    );
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.4);
+}
+
+.edgeLeft {
+  right: 100%;
+  width: var(--stack-l);
+  margin-right: -1px;
+  border-radius: 5px 0 0 5px;
+}
+
+.edgeRight {
+  left: 100%;
+  width: var(--stack-r);
+  margin-left: -1px;
+  border-radius: 0 5px 5px 0;
+}
+
+/* ── Leaf and strips ───────────────────────────────────────────────────── */
+
+.leaf {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.seg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  /* +0.7px overlap hides the hairline seams between adjacent strips. */
+  width: calc(100% / var(--n) + 0.7px);
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-origin: 0 50%;
+}
+
+/* The full page, offset inside the strip so each strip shows its own slice. */
+.face {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: calc((100% - 0.7px) * var(--n));
+  display: flex;
+}
+
+.faceFront {
+  left: calc(-1 * var(--i) * (100% - 0.7px));
+}
+
+/*
+ * The verso is authored as a left-hand page (gutter on its right). Its strip
+ * is rotated a further 180deg about the strip's far end, so the offset counts
+ * inward from the fore-edge instead of outward from the gutter.
+ */
+.faceBack {
+  left: calc((var(--i) + 1 - var(--n)) * (100% - 0.7px));
+}
+
+/* Lambert darkening and the specular band riding the crest of the bow. */
+.shade {
+  position: absolute;
+  inset: 0;
+  background: #1b0f06;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sheen {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(255, 246, 224, 0.75) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* Shadow the turning leaf throws: first onto the page it uncovers, then
+   across the gutter onto the page it is about to land on. */
+.cast {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.castRight {
+  left: 0;
+  background: linear-gradient(90deg, rgba(24, 12, 4, 0.72), rgba(24, 12, 4, 0.06) 62%, transparent);
+}
+
+.castLeft {
+  left: -100%;
+  background: linear-gradient(270deg, rgba(24, 12, 4, 0.72), rgba(24, 12, 4, 0.06) 62%, transparent);
+}
+
+/* ── Paper ─────────────────────────────────────────────────────────────── */
+
+.paper {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(10px, 2.4vw, 30px);
+  background-color: var(--book-paper);
+  background-image:
+    var(--book-grain),
+    radial-gradient(90% 70% at 50% 45%, rgba(255, 252, 244, 0.85), transparent 70%),
+    radial-gradient(120% 100% at 50% 50%, transparent 55%, rgba(120, 92, 46, 0.16)),
+    linear-gradient(120deg, rgba(196, 164, 108, 0.14), rgba(150, 118, 66, 0.08));
+  background-size: 160px 160px, auto, auto, auto;
+  background-blend-mode: multiply, normal, normal, normal;
+  overflow: hidden;
+}
+
+/* Foxing — a few faint age blooms, placed differently on each page via --fox. */
+.paper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background:
+    radial-gradient(9px 7px at calc(18% + var(--fox, 0) * 7%) 22%, rgba(150, 112, 52, 0.16), transparent 70%),
+    radial-gradient(14px 10px at calc(72% - var(--fox, 0) * 9%) 78%, rgba(150, 112, 52, 0.13), transparent 70%),
+    radial-gradient(6px 6px at calc(44% + var(--fox, 0) * 4%) 61%, rgba(150, 112, 52, 0.14), transparent 70%);
+}
+
+.paperRecto {
+  border-left: 1px solid rgba(96, 66, 24, 0.18);
+  box-shadow: inset 14px 0 26px -8px var(--book-gutter), inset 0 0 40px rgba(120, 92, 46, 0.14);
+}
+
+.paperVerso {
+  border-right: 1px solid rgba(96, 66, 24, 0.18);
+  box-shadow: inset -14px 0 26px -8px var(--book-gutter), inset 0 0 40px rgba(120, 92, 46, 0.14);
+}
+
+/* ── Mounted photographic plate ────────────────────────────────────────── */
+
+.plate {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(var(--tilt, 0deg));
+}
+
+.plateMount {
+  position: absolute;
+  inset: 0;
+  padding: clamp(5px, 1.1vw, 11px);
+  padding-bottom: clamp(14px, 3vw, 30px);
+  background: linear-gradient(160deg, #fffdf7, #f2ead8);
+  box-shadow:
+    0 1px 2px rgba(60, 40, 12, 0.28),
+    0 10px 22px -8px rgba(40, 24, 6, 0.45);
+}
+
+.plateImg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: rgba(120, 92, 46, 0.1);
+}
+
+.plateCaption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(3px, 0.9vw, 9px);
+  text-align: center;
+  font-family: var(--font-script);
+  font-size: clamp(9px, 1.5vw, 15px);
+  color: rgba(76, 54, 22, 0.75);
+}
+
+/* Paper photo-corners. */
+.corner {
+  position: absolute;
+  width: clamp(11px, 2.2vw, 22px);
+  height: clamp(11px, 2.2vw, 22px);
+  background: linear-gradient(135deg, rgba(84, 60, 24, 0.5), rgba(48, 33, 12, 0.72));
+  box-shadow: inset 0 0 4px rgba(255, 240, 210, 0.28);
+}
+
+.cTL { top: 0; left: 0; clip-path: polygon(0 0, 100% 0, 0 100%); }
+.cTR { top: 0; right: 0; clip-path: polygon(100% 0, 100% 100%, 0 0); }
+.cBL { bottom: 0; left: 0; clip-path: polygon(0 0, 0 100%, 100% 100%); }
+.cBR { bottom: 0; right: 0; clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+
+/* ── Typography on paper ───────────────────────────────────────────────── */
+
+.rule {
+  width: 46%;
+  height: 1px;
+  margin: clamp(6px, 1.4vh, 14px) auto;
+  background: linear-gradient(90deg, transparent, var(--book-gilt), transparent);
+  opacity: 0.7;
+}
+
+.script {
+  font-family: var(--font-script);
+  color: var(--book-gilt-lo);
+  font-size: clamp(17px, 3.4vw, 40px);
+  line-height: 1.25;
+}
+
+.serif {
+  font-family: var(--font-serif);
+  color: var(--book-ink);
+}
+
+.smallCaps {
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.34em;
+  font-size: clamp(7px, 1.05vw, 11px);
+  color: rgba(96, 66, 24, 0.7);
+}
+
+.verse {
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: rgba(58, 42, 20, 0.86);
+  font-size: clamp(10px, 1.5vw, 16px);
+  line-height: 1.85;
+  text-align: center;
+}
+
+/* Illuminated initial. */
+.dropCap {
+  float: left;
+  font-family: var(--font-serif);
+  font-size: clamp(34px, 7vw, 74px);
+  line-height: 0.82;
+  margin: 4px 10px 0 0;
+  padding: clamp(4px, 1vw, 10px);
+  color: var(--book-gilt-lo);
+  border: 1px solid var(--book-gilt);
+  background: radial-gradient(circle at 32% 28%, rgba(255, 246, 220, 0.9), rgba(212, 175, 55, 0.16));
+  box-shadow: inset 0 0 0 3px rgba(255, 250, 232, 0.7);
+}
+
+/* Faint filigree watermark, so an all-text page never looks bare. */
+.watermark {
+  position: absolute;
+  inset: 14%;
+  pointer-events: none;
+  opacity: 0.07;
+  color: var(--book-gilt-lo);
+}
+
+/* ── Endpapers ─────────────────────────────────────────────────────────── */
+
+.endpaper {
+  background-color: var(--book-paper);
+  background-image:
+    var(--book-grain),
+    radial-gradient(circle at 50% 50%, transparent 62%, rgba(96, 66, 24, 0.16)),
+    repeating-conic-gradient(
+      from 30deg at 50% 50%,
+      var(--primary-soft) 0deg 10deg,
+      transparent 10deg 20deg
+    ),
+    linear-gradient(135deg, rgba(150, 118, 66, 0.16), rgba(196, 164, 108, 0.1));
+  background-size: 160px 160px, auto, 90px 90px, auto;
+  background-blend-mode: multiply, normal, normal, normal;
+}
+
+.wax {
+  width: clamp(34px, 6vw, 62px);
+  height: clamp(34px, 6vw, 62px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, var(--seal-light), var(--seal) 48%, var(--seal-dark) 100%);
+  box-shadow: 0 4px 10px rgba(40, 6, 6, 0.45), inset 0 -3px 6px rgba(0, 0, 0, 0.35);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-serif);
+  font-size: clamp(12px, 2.2vw, 22px);
+  color: rgba(255, 232, 210, 0.82);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+}
+
+/* ── Cover ─────────────────────────────────────────────────────────────── */
+
+.cover {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(16px, 3.6vw, 44px);
+  background-color: var(--book-leather);
+  background-image:
+    var(--book-grain),
+    radial-gradient(110% 85% at 32% 16%, rgba(255, 226, 190, 0.2), transparent 60%),
+    linear-gradient(150deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.58) 52%, rgba(0, 0, 0, 0.8) 100%);
+  background-size: 160px 160px, auto, auto;
+  background-blend-mode: overlay, screen, multiply;
+  overflow: hidden;
+}
+
+.coverFront {
+  box-shadow: inset 12px 0 26px rgba(0, 0, 0, 0.62), inset -2px 0 4px rgba(255, 220, 170, 0.08);
+}
+
+.coverBack {
+  box-shadow: inset -12px 0 26px rgba(0, 0, 0, 0.62), inset 2px 0 4px rgba(255, 220, 170, 0.08);
+}
+
+/* Gilt double rule. */
+.coverRule {
+  position: absolute;
+  inset: clamp(11px, 2.2vw, 22px);
+  border: 1px solid var(--book-gilt);
+  opacity: 0.62;
+  pointer-events: none;
+}
+
+.coverRule::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border: 2px solid var(--book-gilt);
+  opacity: 0.34;
+}
+
+.fleuron {
+  position: absolute;
+  width: clamp(22px, 4.4vw, 46px);
+  height: clamp(22px, 4.4vw, 46px);
+  color: var(--book-gilt);
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+.fTL { top: clamp(13px, 2.6vw, 26px); left: clamp(13px, 2.6vw, 26px); }
+.fTR { top: clamp(13px, 2.6vw, 26px); right: clamp(13px, 2.6vw, 26px); transform: scaleX(-1); }
+.fBL { bottom: clamp(13px, 2.6vw, 26px); left: clamp(13px, 2.6vw, 26px); transform: scaleY(-1); }
+.fBR { bottom: clamp(13px, 2.6vw, 26px); right: clamp(13px, 2.6vw, 26px); transform: scale(-1); }
+
+/* Foil-stamped lettering. The sweep costs nothing until the reader hovers. */
+.foil {
+  background: linear-gradient(
+    104deg,
+    var(--book-gilt-lo) 0%,
+    var(--book-gilt) 26%,
+    var(--book-gilt-hi) 42%,
+    #fff6de 50%,
+    var(--book-gilt-hi) 58%,
+    var(--book-gilt) 74%,
+    var(--book-gilt-lo) 100%
+  );
+  background-size: 280% 100%;
+  background-position: 62% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.55)) drop-shadow(0 -1px 0 rgba(255, 232, 190, 0.12));
+  transition: background-position 1.4s ease;
+}
+
+.stage:hover .foil {
+  background-position: 8% 0;
+}
+
+.coverNames {
+  font-family: var(--font-serif);
+  font-size: clamp(19px, 3.6vw, 44px);
+  letter-spacing: 0.06em;
+  text-align: center;
+  line-height: 1.18;
+}
+
+.coverKicker {
+  font-family: var(--font-script);
+  font-size: clamp(14px, 2.4vw, 28px);
+  margin-bottom: clamp(4px, 1vh, 10px);
+}
+
+/* Blind-debossed monogram medallion. */
+.medallion {
+  width: clamp(42px, 8vw, 88px);
+  height: clamp(42px, 8vw, 88px);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  margin-bottom: clamp(8px, 2vh, 20px);
+  border: 1px solid rgba(255, 226, 180, 0.22);
+  background: radial-gradient(circle at 38% 32%, rgba(0, 0, 0, 0.36), rgba(0, 0, 0, 0.05));
+  box-shadow:
+    inset 2px 2px 5px rgba(0, 0, 0, 0.72),
+    inset -2px -2px 4px rgba(255, 216, 170, 0.14),
+    0 1px 0 rgba(255, 216, 170, 0.08);
+  font-family: var(--font-serif);
+  font-size: clamp(14px, 2.6vw, 30px);
+  color: rgba(255, 224, 180, 0.34);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.8), 0 -1px 0 rgba(255, 226, 180, 0.12);
+}
+
+/* Metal corner plates on the fore-edge corners. */
+.boss {
+  position: absolute;
+  width: clamp(20px, 4vw, 42px);
+  height: clamp(20px, 4vw, 42px);
+  background: linear-gradient(135deg, var(--book-gilt-hi), var(--book-gilt) 45%, var(--book-gilt-lo));
+  box-shadow: inset 0 0 0 1px rgba(60, 40, 8, 0.5), 0 1px 3px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+}
+
+.bossTR { top: 0; right: 0; clip-path: polygon(100% 0, 100% 100%, 0 0); }
+.bossBR { bottom: 0; right: 0; clip-path: polygon(100% 0, 100% 100%, 0 100%); }
+.bossTL { top: 0; left: 0; clip-path: polygon(0 0, 100% 0, 0 100%); }
+.bossBL { bottom: 0; left: 0; clip-path: polygon(0 0, 0 100%, 100% 100%); }
+
+/* Raised bands, on the spine-side sliver of the cover. */
+.bands {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: clamp(14px, 2.6vw, 26px);
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 12%,
+      rgba(0, 0, 0, 0.55) 12% 13.4%,
+      rgba(255, 216, 170, 0.16) 13.4% 14.6%,
+      transparent 14.6% 25%
+    ),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.55), transparent);
+}
+
+.bandsLeft { left: 0; }
+.bandsRight { right: 0; transform: scaleX(-1); }
+
+/* ── Chrome ────────────────────────────────────────────────────────────── */
+
+.nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 60;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: var(--book-gilt-hi);
+  background: rgba(28, 16, 8, 0.72);
+  border: 1px solid var(--book-gilt);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease, background 0.2s ease, opacity 0.2s ease;
+}
+
+.nav:hover:not(:disabled) {
+  background: rgba(48, 28, 12, 0.9);
+  transform: translateY(-50%) scale(1.09);
+}
+
+.nav:disabled {
+  opacity: 0.22;
+  cursor: default;
+}
+
+.navPrev { left: -14px; }
+.navNext { right: -14px; }
+
+@media (min-width: 768px) {
+  .navPrev { left: -30px; }
+  .navNext { right: -30px; }
+}
+
+.hint {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(10px, 1.4vw, 13px);
+  color: rgba(140, 120, 99, 0.75);
+  text-align: center;
+  pointer-events: none;
+}
+
+/* Gold dust lifted by the turning page. */
+.dust {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 34%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 55;
+  opacity: var(--activity, 0);
+}
+
+.mote {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--book-gilt-hi);
+  box-shadow: 0 0 6px var(--book-gilt);
+  animation: rise 4.5s ease-in-out infinite;
+}
+
+@keyframes rise {
+  0% { transform: translate3d(0, 30%, 0) scale(0.4); opacity: 0; }
+  30% { opacity: 0.9; }
+  100% { transform: translate3d(var(--dx, 10px), -70%, 0) scale(1); opacity: 0; }
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mote { animation: none; }
+  .foil { transition: none; }
+}

@@ -253,3 +253,29 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 .section-bg-contact {
   background: linear-gradient(to bottom, transparent 0%, var(--bg-cream) 40%, var(--bg-ivory) 100%);
 }
+
+/*
+ * THE CHRONICLE — gallery book
+ * ---------------------------
+ * The book is drawn entirely from theme tokens so it reads as leather-and-gilt
+ * in every preset. Deliberately no color-mix(): browserslist still targets
+ * Safari 13, where an unsupported value inside a custom property fails at
+ * substitution time and takes the whole declaration with it. Translucent
+ * overlays stacked over var(--seal) / var(--bg-cream) get the same tinting with
+ * universal support.
+ */
+:root {
+  /* Leather is the wax-seal colour pushed toward oxblood by black overlays. */
+  --book-leather: var(--seal);
+  --book-gilt: var(--gold);
+  --book-gilt-hi: var(--gold-light);
+  --book-gilt-lo: var(--gold-dark);
+
+  /* Paper is the cream surface warmed toward aged rag stock. */
+  --book-paper: var(--bg-cream);
+  --book-ink: var(--charcoal);
+  --book-gutter: rgba(38, 20, 8, 0.55);
+
+  /* Fibre/leather grain. One tile, reused by every page — no extra requests. */
+  --book-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+}

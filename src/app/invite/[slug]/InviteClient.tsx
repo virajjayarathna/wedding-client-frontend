@@ -157,6 +157,7 @@ export default function InviteClient() {
               images={wedding.galleryUrls} 
               brideName={wedding.brideName} 
               groomName={wedding.groomName} 
+              weddingDate={wedding.weddingDate}
             />
           )}
 
