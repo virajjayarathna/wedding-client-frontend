@@ -90,7 +90,10 @@ export async function generateMetadata({ params }: InvitePageProps): Promise<Met
   const weddingDate = wedding.weddingDate
     ? new Date(wedding.weddingDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
     : '';
-  const description = `You are cordially invited to the wedding of ${wedding.brideName} & ${wedding.groomName}${weddingDate ? ` on ${weddingDate}` : ''}. View your invitation and RSVP here.`;
+  const isHomeComing = wedding.ceremonyType === 'HOME_COMING';
+  const description = isHomeComing
+    ? `You are cordially invited to the homecoming of ${wedding.groomName} & ${wedding.brideName}${weddingDate ? ` on ${weddingDate}` : ''}. View your invitation and RSVP here.`
+    : `You are cordially invited to the wedding of ${wedding.brideName} & ${wedding.groomName}${weddingDate ? ` on ${weddingDate}` : ''}. View your invitation and RSVP here.`;
 
   const image = pickOgImage(wedding);
 
