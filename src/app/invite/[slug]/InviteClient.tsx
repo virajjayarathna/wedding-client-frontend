@@ -108,8 +108,8 @@ export default function InviteClient() {
   const { wedding, guest } = data;
   const isLegacyFamilyTitle = guest.title === 'FAMILY';
   const baseGuestName = isLegacyFamilyTitle
-    ? `${TITLE_MAP[guest.title]} ${guest.lastName} Family`
-    : `${TITLE_MAP[guest.title]} ${guest.firstName} ${guest.lastName}`;
+    ? `${TITLE_MAP[guest.title] || guest.title} ${guest.lastName} Family`
+    : `${TITLE_MAP[guest.title] || guest.title} ${guest.firstName} ${guest.lastName}`;
   const guestName = guest.isFamily ? `${baseGuestName} and Family` : baseGuestName;
 
   // Build contacts array for ContactSection from the guest's assigned RSVP

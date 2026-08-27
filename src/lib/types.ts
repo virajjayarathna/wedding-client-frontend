@@ -1,5 +1,5 @@
 export type RsvpStatus = 'PENDING' | 'ATTENDING' | 'DECLINING' | 'MAYBE';
-export type GuestTitle = 'MR' | 'MRS' | 'MR_AND_MRS' | 'MS' | 'DR' | 'FAMILY' | 'MASTER' | 'BRIG' | 'BRIG_AND_MRS' | 'MAJ';
+export type GuestTitle = string;
 export type MusicType = 'SPOTIFY' | 'UPLOAD';
 
 export interface TimelineEvent {
